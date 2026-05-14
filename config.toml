@@ -1,0 +1,19 @@
+[paths]
+assets_dir = "./assets"
+log_path = "./logs/demo.jsonl"
+checkpoint = "./best.pt"
+
+[runtime]
+device = "auto"  # "auto", "cuda", "cpu"
+inference_backend = "pytorch"  # "pytorch" 또는 "onnx"
+warmup_on_start = true
+
+[fusion]
+reject_threshold = 0.25
+image_only = { w_image = 1.0, w_text = 0.0, w_keyword = 0.0 }
+text_only = { w_image = 0.0, w_text = 0.6, w_keyword = 0.4 }
+
+[ui]
+title = "Jongno Landmark Demo"
+max_image_mb = 10
+slow_inference_ms = 5000

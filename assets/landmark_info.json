@@ -1,0 +1,148 @@
+{
+  "version": "sprint1-v1",
+  "items": [
+    {
+      "landmark_id": "bohyunsanshingak",
+      "name_ko": "보현산 신각",
+      "name_en": "Bohyunsan Shingak",
+      "aliases": ["보현산", "Bohyunsan"],
+      "description_ko": "보현산 신각은 경상북도 영천 보현산에 위치한 전통 목조 누각입니다. 산세와 어우러진 단아한 한국 전통 건축 양식이 특징입니다.",
+      "latitude": 36.16389,
+      "longitude": 128.97583,
+      "hero_image_path": "hero_images/bohyunsanshingak.jpg",
+      "tags": ["전통건축", "누각", "산"]
+    },
+    {
+      "landmark_id": "changgyeonggung",
+      "name_ko": "창경궁",
+      "name_en": "Changgyeonggung Palace",
+      "aliases": ["창경궁", "Changgyeong Palace"],
+      "description_ko": "창경궁은 조선시대 5대 궁궐 중 하나로 1483년 성종 때 창건되었습니다. 정전인 명정전은 현존하는 가장 오래된 조선시대 정전 건물입니다.",
+      "latitude": 37.5786,
+      "longitude": 126.9947,
+      "hero_image_path": "hero_images/changgyeonggung.jpg",
+      "tags": ["궁궐", "조선왕조", "유네스코관련"]
+    },
+    {
+      "landmark_id": "cheonggyecheon",
+      "name_ko": "청계천",
+      "name_en": "Cheonggyecheon Stream",
+      "aliases": ["청계천", "Cheonggye Stream"],
+      "description_ko": "청계천은 서울 도심을 흐르는 하천으로 2005년 복원되었습니다. 약 11km 구간이 시민 산책로와 도심 생태공간으로 조성되어 있습니다.",
+      "latitude": 37.5696,
+      "longitude": 126.9783,
+      "hero_image_path": "hero_images/cheonggyecheon.jpg",
+      "tags": ["하천", "도심공원", "산책"]
+    },
+    {
+      "landmark_id": "cheongwadae",
+      "name_ko": "청와대",
+      "name_en": "Cheongwadae (former Blue House)",
+      "aliases": ["청와대", "Blue House", "Presidential Residence"],
+      "description_ko": "청와대는 1948년부터 2022년까지 대한민국 대통령 관저로 사용된 건물입니다. 푸른 청기와 지붕이 특징이며 현재는 일반에 개방되어 있습니다.",
+      "latitude": 37.5866,
+      "longitude": 126.9745,
+      "hero_image_path": "hero_images/cheongwadae.jpg",
+      "tags": ["근대건축", "관저", "개방"]
+    },
+    {
+      "landmark_id": "deoksugung",
+      "name_ko": "덕수궁",
+      "name_en": "Deoksugung Palace",
+      "aliases": ["덕수궁", "Deoksu Palace"],
+      "description_ko": "덕수궁은 조선의 5대 궁궐 중 하나로 서울 중구에 위치합니다. 전통 한국 건축과 서양식 석조전이 공존하는 독특한 풍경으로 유명합니다.",
+      "latitude": 37.5658,
+      "longitude": 126.9751,
+      "hero_image_path": "hero_images/deoksugung.jpg",
+      "tags": ["궁궐", "조선왕조", "근대"]
+    },
+    {
+      "landmark_id": "gwanghwamun",
+      "name_ko": "광화문",
+      "name_en": "Gwanghwamun Gate",
+      "aliases": ["광화문", "경복궁 광화문", "Gyeongbokgung Gate"],
+      "description_ko": "광화문은 경복궁의 정문으로 1395년 처음 세워졌습니다. 한국전쟁 때 소실된 후 2010년 원형에 가깝게 복원되었습니다.",
+      "latitude": 37.5759,
+      "longitude": 126.9769,
+      "hero_image_path": "hero_images/gwanghwamun.jpg",
+      "tags": ["문", "궁궐", "조선왕조"]
+    },
+    {
+      "landmark_id": "gyeongbokgung_geunjeongmun",
+      "name_ko": "경복궁 근정문",
+      "name_en": "Geunjeongmun Gate of Gyeongbokgung",
+      "aliases": ["근정문", "Geunjeongmun"],
+      "description_ko": "근정문은 경복궁 정전인 근정전으로 들어가는 중문입니다. 광화문과 흥례문을 지나야 만나는 위치이며 보물로 지정되어 있습니다.",
+      "latitude": 37.5784,
+      "longitude": 126.9770,
+      "hero_image_path": "hero_images/gyeongbokgung_geunjeongmun.jpg",
+      "tags": ["문", "궁궐", "보물"]
+    },
+    {
+      "landmark_id": "jogyesa",
+      "name_ko": "조계사",
+      "name_en": "Jogyesa Temple",
+      "aliases": ["조계사", "Jogye Temple"],
+      "description_ko": "조계사는 대한불교 조계종의 총본산으로 1910년 창건되었습니다. 도심 한복판에 위치한 전통 사찰로 봄 연등 축제로 널리 알려져 있습니다.",
+      "latitude": 37.5739,
+      "longitude": 126.9819,
+      "hero_image_path": "hero_images/jogyesa.jpg",
+      "tags": ["사찰", "불교", "도심"]
+    },
+    {
+      "landmark_id": "jongmyo_shrine",
+      "name_ko": "종묘",
+      "name_en": "Jongmyo Shrine",
+      "aliases": ["종묘", "Jongmyo"],
+      "description_ko": "종묘는 조선왕조 역대 왕과 왕비의 신주를 모신 사당입니다. 1995년 유네스코 세계문화유산으로 등재되었고 종묘제례악도 인류무형문화유산입니다.",
+      "latitude": 37.5747,
+      "longitude": 126.9941,
+      "hero_image_path": "hero_images/jongmyo_shrine.jpg",
+      "tags": ["사당", "유네스코", "조선왕조"]
+    },
+    {
+      "landmark_id": "mmca_seoul",
+      "name_ko": "국립현대미술관 서울",
+      "name_en": "MMCA Seoul",
+      "aliases": ["국립현대미술관", "MMCA", "현대미술관 서울관"],
+      "description_ko": "국립현대미술관 서울관은 2013년 경복궁 옆 옛 기무사 부지에 개관했습니다. 한국 근현대 미술과 동시대 미술을 전시합니다.",
+      "latitude": 37.5790,
+      "longitude": 126.9803,
+      "hero_image_path": "hero_images/mmca_seoul.jpg",
+      "tags": ["미술관", "현대미술", "박물관"]
+    },
+    {
+      "landmark_id": "myeongdong_cathedral",
+      "name_ko": "명동성당",
+      "name_en": "Myeongdong Cathedral",
+      "aliases": ["명동성당", "Myeongdong Catholic Cathedral"],
+      "description_ko": "명동성당은 1898년 완공된 한국 최초의 고딕 양식 성당입니다. 천주교 서울대교구 주교좌성당이며 사적 제258호입니다.",
+      "latitude": 37.5634,
+      "longitude": 126.9870,
+      "hero_image_path": "hero_images/myeongdong_cathedral.jpg",
+      "tags": ["성당", "천주교", "근대건축"]
+    },
+    {
+      "landmark_id": "naksan_park",
+      "name_ko": "낙산공원",
+      "name_en": "Naksan Park",
+      "aliases": ["낙산공원", "Naksan"],
+      "description_ko": "낙산공원은 한양도성 성곽길을 따라 조성된 공원입니다. 종로구 동쪽 낙산 자락에 위치하며 서울 도심 야경 명소로 알려져 있습니다.",
+      "latitude": 37.5800,
+      "longitude": 127.0078,
+      "hero_image_path": "hero_images/naksan_park.jpg",
+      "tags": ["공원", "성곽", "야경"]
+    },
+    {
+      "landmark_id": "statue_of_king_sejong",
+      "name_ko": "세종대왕 동상",
+      "name_en": "Statue of King Sejong",
+      "aliases": ["세종대왕상", "King Sejong Statue", "광화문 세종대왕"],
+      "description_ko": "세종대왕 동상은 광화문광장에 위치한 청동 좌상으로 2009년 한글날에 건립되었습니다. 높이 약 6.2m로 한글 창제와 학문 진흥의 업적을 기립니다.",
+      "latitude": 37.5720,
+      "longitude": 126.9769,
+      "hero_image_path": "hero_images/statue_of_king_sejong.jpg",
+      "tags": ["동상", "조선왕조", "한글"]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pt
+*.onnx
+logs/
+.pytest_cache/
+.streamlit/secrets.toml
+build_assets.log
