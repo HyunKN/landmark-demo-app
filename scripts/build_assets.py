@@ -110,28 +110,74 @@ def build_prototypes(model, recognizer: ImageRecognizer, data_root: Path, classe
     return items
 
 
-def build_text_index(text_encoder: TextEncoder, landmark_info: dict) -> list[dict]:
+def _load_text_catalog(path: Path | None) -> dict[str, dict]:
+    if path is None or not path.exists():
+        return {}
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    return {item["landmark_id"]: item for item in doc.get("items", [])}
+
+
+def _catalog_texts(entry: dict, catalog_entry: dict | None) -> tuple[list[str], list[str]]:
+    keywords = entry.get("aliases", []) + entry.get("tags", [])
+    parts = [
+        f"a photo of {entry['name_en']}",
+        entry.get("description_ko", ""),
+        f"a Korean landmark called {entry['name_ko']}",
+        ", ".join(keywords),
+    ]
+    if catalog_entry:
+        for key in (
+            "aliases_en",
+            "aliases_ko",
+            "user_queries_en",
+            "user_queries_ko",
+            "visual_features_en",
+            "visual_features_ko",
+            "contrast_en",
+            "contrast_ko",
+        ):
+            values = catalog_entry.get(key, [])
+            if isinstance(values, list):
+                parts.extend(str(v) for v in values if v)
+                keywords.extend(str(v) for v in values if v)
+        for key in ("description_en", "description_ko"):
+            value = catalog_entry.get(key)
+            if value:
+                parts.append(str(value))
+    return [p for p in parts if p], keywords
+
+
+def _encode_texts_as_average(text_encoder: TextEncoder, texts: list[str]) -> np.ndarray:
+    """Encode several short bilingual prompts and L2-normalize their average.
+
+    A single long prompt is easy to truncate in CLIP tokenization. Averaging
+    short prompts keeps Korean/English aliases, visual descriptions, and
+    contrast captions represented without changing the app's search contract.
+    """
+    embeddings = text_encoder.encode_many(texts)
+    norms = np.linalg.norm(embeddings, axis=1, keepdims=True) + 1e-12
+    embeddings = embeddings / norms
+    embedding = np.mean(embeddings, axis=0)
+    embedding = embedding / (np.linalg.norm(embedding) + 1e-12)
+    return embedding.astype(np.float32)
+
+
+def build_text_index(text_encoder: TextEncoder, landmark_info: dict, text_catalog: dict[str, dict] | None = None) -> list[dict]:
     items = []
+    text_catalog = text_catalog or {}
     for entry in landmark_info["items"]:
         landmark_id = entry["landmark_id"]
-        # description + name + keywords concatenation
-        keywords = entry.get("aliases", []) + entry.get("tags", [])
-        parts = [
-            f"a photo of {entry['name_en']}",
-            entry.get("description_ko", ""),
-            f"a Korean landmark called {entry['name_ko']}",
-            ", ".join(keywords),
-        ]
-        composite = ". ".join(p for p in parts if p)
-        embedding = text_encoder.encode(composite)
+        text_parts, keywords = _catalog_texts(entry, text_catalog.get(landmark_id))
+        embedding = _encode_texts_as_average(text_encoder, text_parts)
         items.append({
             "landmark_id": landmark_id,
             "description_ko": entry.get("description_ko", ""),
-            "description_en": "",
-            "keywords": keywords,
+            "description_en": " ".join(text_catalog.get(landmark_id, {}).get("visual_features_en", [])),
+            "keywords": sorted(set(keywords)),
+            "n_text_prompts": len(text_parts),
             "embedding": embedding.astype(float).tolist(),
         })
-        print(f"[text] {landmark_id}: encoded {len(composite)} chars")
+        print(f"[text] {landmark_id}: encoded {len(text_parts)} prompts")
     return items
 
 
@@ -157,6 +203,7 @@ def main() -> None:
     parser.add_argument("--checkpoint", required=True)
     parser.add_argument("--data-root", required=True)
     parser.add_argument("--landmark-info", required=True)
+    parser.add_argument("--text-catalog", default=None)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--device", default="auto")
     parser.add_argument("--skip-prototypes", action="store_true")
@@ -177,6 +224,10 @@ def main() -> None:
     recognizer = ImageRecognizer(model, image_size, image_mean, image_std, device=device)
 
     landmark_info = json.loads(Path(args.landmark_info).read_text(encoding="utf-8"))
+    text_catalog_path = Path(args.text_catalog) if args.text_catalog else Path(args.landmark_info).with_name("landmark_text_catalog_v2.json")
+    text_catalog = _load_text_catalog(text_catalog_path)
+    if text_catalog:
+        print(f"[load] text catalog: {text_catalog_path} ({len(text_catalog)} classes)")
     info_classes = [it["landmark_id"] for it in landmark_info["items"]]
     if set(info_classes) != set(classes):
         print(f"  WARN: landmark_info={info_classes}\n  ckpt={classes}")
@@ -211,13 +262,14 @@ def main() -> None:
         import open_clip
         tokenizer = open_clip.get_tokenizer(cfg["model"]["model_name"])
         text_encoder = TextEncoder(model, tokenizer, device=device)
-        text_items = build_text_index(text_encoder, landmark_info)
+        text_items = build_text_index(text_encoder, landmark_info, text_catalog)
         text_doc = {
-            "version": "sprint1-v1",
+            "version": "dataset-v2-text-index" if text_catalog else "sprint1-v1",
             "encoder": {
                 "model_name": cfg["model"]["model_name"] + "-text",
                 "embedding_dim": len(text_items[0]["embedding"]) if text_items else 512,
             },
+            "text_catalog_version": "dataset-v2-text-catalog-2026-05-16" if text_catalog else None,
             "items": text_items,
         }
         out_path = output_dir / "landmark_text_index.json"

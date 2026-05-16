@@ -1,0 +1,149 @@
+{
+  "version": "dataset-v2-text-catalog-2026-05-16",
+  "notes": "Bilingual search and caption expansion catalog. English is preserved because MobileCLIP2 text encoding is strongest in English; Korean is added for the expected user query distribution.",
+  "items": [
+    {
+      "landmark_id": "bohyunsanshingak",
+      "aliases_en": ["Bohyunsan Shingak", "Bohyunsan mountain shrine", "small Korean shrine", "mountain spirit shrine"],
+      "aliases_ko": ["보현산 신각", "보현산신각", "산신각", "작은 사당", "산속 사당"],
+      "user_queries_en": ["small red shrine in the mountain", "Korean mountain spirit shrine", "traditional shrine with tiled roof"],
+      "user_queries_ko": ["산속 작은 사당", "붉은 전통 사당", "보현산에 있는 산신각", "기와지붕 작은 사당"],
+      "visual_features_en": ["A small traditional Korean shrine with a tiled roof, red wooden structure, dancheong painting, and surrounding trees."],
+      "visual_features_ko": ["기와지붕과 단청이 있는 작은 붉은 사당으로, 숲과 나무에 둘러싸인 전통 건축물이다."],
+      "contrast_en": ["Unlike Gwanghwamun or palace gates, this is a small single-room shrine without a large stone arch base."],
+      "contrast_ko": ["광화문이나 궁궐 문처럼 큰 석조 아치가 있는 정문이 아니라, 산속의 작은 단칸 사당에 가깝다."]
+    },
+    {
+      "landmark_id": "changgyeonggung",
+      "aliases_en": ["Changgyeonggung Palace", "Changgyeong Palace", "Myeongjeongjeon palace area"],
+      "aliases_ko": ["창경궁", "창경궁 궁궐", "명정전", "조선 궁궐"],
+      "user_queries_en": ["old Joseon palace courtyard", "palace building with red columns", "traditional Korean palace hall"],
+      "user_queries_ko": ["조선시대 궁궐", "붉은 기둥 궁궐", "오래된 궁궐 건물", "창경궁 전각"],
+      "visual_features_en": ["A Joseon palace complex with traditional tiled roofs, red wooden columns, open courtyards, and historic palace halls."],
+      "visual_features_ko": ["붉은 기둥과 전통 기와지붕, 넓은 마당이 보이는 조선시대 궁궐 전각이다."],
+      "contrast_en": ["Unlike Gwanghwamun, this is an inner palace complex rather than a large front gate facing a boulevard."],
+      "contrast_ko": ["광화문처럼 도로 앞에 선 큰 정문이 아니라, 궁궐 안쪽의 전각과 마당이 중심이다."]
+    },
+    {
+      "landmark_id": "cheonggyecheon",
+      "aliases_en": ["Cheonggyecheon Stream", "Cheonggye Stream", "downtown Seoul stream", "urban stream walkway"],
+      "aliases_ko": ["청계천", "도심 하천", "서울 도심 하천", "청계천 산책로"],
+      "user_queries_en": ["stream in downtown Seoul", "waterway with walking path", "urban river at night"],
+      "user_queries_ko": ["서울 도심의 하천", "물길 산책로", "도심 속 개천", "청계천 야경"],
+      "visual_features_en": ["A restored urban stream running through downtown Seoul with stone banks, bridges, walkways, and night lighting."],
+      "visual_features_ko": ["서울 도심을 흐르는 복원 하천으로, 돌 제방과 다리, 산책로, 야간 조명이 특징이다."],
+      "contrast_en": ["Unlike palace or shrine landmarks, the main subject is water, bridges, and a sunken pedestrian stream path."],
+      "contrast_ko": ["궁궐이나 사당 건물이 아니라 물길, 다리, 낮은 산책로가 주 피사체다."]
+    },
+    {
+      "landmark_id": "cheongwadae",
+      "aliases_en": ["Cheongwadae", "Blue House", "former presidential residence", "blue roof presidential residence"],
+      "aliases_ko": ["청와대", "블루하우스", "대통령 관저", "푸른 기와 지붕", "북악산 아래 관저"],
+      "user_queries_en": ["blue roof presidential building", "former Korean presidential residence", "building near Bugaksan mountain with blue tiles"],
+      "user_queries_ko": ["파란 지붕 대통령 관저", "청와대 본관", "북악산 아래 푸른 지붕 건물", "예전 대통령 집무실"],
+      "visual_features_en": ["A low presidential residence with distinctive blue tiled roofs, white walls, lawns, and Bugaksan mountain behind it."],
+      "visual_features_ko": ["푸른 기와지붕과 흰 벽, 잔디밭, 뒤쪽의 북악산 배경이 특징인 낮은 관저 건물이다."],
+      "contrast_en": ["Unlike Gwanghwamun, it is not a large stone gate with three arched entrances; the blue roof residence is the main cue."],
+      "contrast_ko": ["광화문처럼 세 개의 석조 아치가 있는 큰 문이 아니라, 푸른 기와지붕 관저가 핵심 단서다."]
+    },
+    {
+      "landmark_id": "deoksugung",
+      "aliases_en": ["Deoksugung Palace", "Deoksu Palace", "Seokjojeon palace", "palace stone wall road"],
+      "aliases_ko": ["덕수궁", "덕수궁 돌담길", "석조전", "전통과 근대 건축이 있는 궁"],
+      "user_queries_en": ["palace with western style stone building", "Deoksugung stone wall", "palace near city hall"],
+      "user_queries_ko": ["덕수궁 돌담길", "석조전 있는 궁궐", "시청 근처 궁", "전통 건물과 서양식 건물이 같이 있는 궁"],
+      "visual_features_en": ["A palace site mixing traditional Korean halls, stone walls, tree-lined paths, and western-style stone architecture."],
+      "visual_features_ko": ["전통 궁궐 전각과 돌담길, 나무가 있는 산책로, 서양식 석조전이 함께 보이는 궁궐이다."],
+      "contrast_en": ["Unlike Gwanghwamun, Deoksugung often shows stone wall roads or western-style buildings rather than a massive front gate."],
+      "contrast_ko": ["광화문처럼 거대한 궁궐 정문보다 돌담길이나 석조전 같은 근대 건축 단서가 중요하다."]
+    },
+    {
+      "landmark_id": "gwanghwamun",
+      "aliases_en": ["Gwanghwamun Gate", "Gwanghwamun of Gyeongbokgung", "main palace gate", "large palace gate"],
+      "aliases_ko": ["광화문", "경복궁 광화문", "궁궐 정문", "큰 궁궐문", "세 개의 아치문"],
+      "user_queries_en": ["large palace gate with three stone arches", "main gate of Gyeongbokgung", "palace gate facing a wide boulevard"],
+      "user_queries_ko": ["세 개의 아치가 있는 큰 궁궐문", "경복궁 정문", "광화문광장 앞 큰 문", "도로 앞에 있는 궁궐 정문"],
+      "visual_features_en": ["A large front palace gate with a high stone base, three arched entrances, red wooden doors, painted eaves, and a double-tiered tiled roof."],
+      "visual_features_ko": ["높은 석조 기단과 세 개의 아치형 출입구, 붉은 문, 단청 처마, 이층 기와지붕이 있는 큰 궁궐 정문이다."],
+      "contrast_en": ["Unlike Cheongwadae, Gwanghwamun is a gate facing the boulevard and does not have the blue tiled presidential residence as the main subject."],
+      "contrast_ko": ["청와대처럼 푸른 지붕의 관저가 아니라, 넓은 도로와 광장 앞에 선 세 아치 구조의 궁궐 정문이다."]
+    },
+    {
+      "landmark_id": "gyeongbokgung_geunjeongmun",
+      "aliases_en": ["Geunjeongmun Gate", "Geunjeongmun of Gyeongbokgung", "inner gate of Gyeongbokgung"],
+      "aliases_ko": ["근정문", "경복궁 근정문", "경복궁 중문", "근정전 앞 문"],
+      "user_queries_en": ["inner palace gate before Geunjeongjeon", "gate inside Gyeongbokgung courtyard", "red palace gate behind Gwanghwamun"],
+      "user_queries_ko": ["경복궁 안쪽 문", "근정전으로 들어가는 문", "광화문 안쪽의 중문", "경복궁 마당 안의 문"],
+      "visual_features_en": ["An inner Gyeongbokgung palace gate with red walls, tiled roof, and a courtyard setting before the main throne hall."],
+      "visual_features_ko": ["경복궁 안쪽 마당에 있는 붉은 벽과 기와지붕의 중문으로, 근정전으로 들어가는 입구다."],
+      "contrast_en": ["Unlike Gwanghwamun, it is inside the palace grounds and is not directly facing a city boulevard."],
+      "contrast_ko": ["광화문처럼 도로와 광장을 향한 외부 정문이 아니라, 경복궁 안쪽 마당의 중문이다."]
+    },
+    {
+      "landmark_id": "jogyesa",
+      "aliases_en": ["Jogyesa Temple", "Jogye Temple", "Buddhist temple in downtown Seoul"],
+      "aliases_ko": ["조계사", "조계종 사찰", "도심 사찰", "연등 사찰"],
+      "user_queries_en": ["Buddhist temple with lanterns", "downtown Seoul temple", "temple with colorful lotus lanterns"],
+      "user_queries_ko": ["연등이 많은 절", "서울 도심 사찰", "조계종 총본산", "불교 사찰"],
+      "visual_features_en": ["A Buddhist temple in downtown Seoul with colorful lanterns, dancheong-painted wooden halls, and temple courtyard scenes."],
+      "visual_features_ko": ["도심 속 불교 사찰로, 색색의 연등과 단청이 칠해진 목조 법당, 사찰 마당이 특징이다."],
+      "contrast_en": ["Unlike Jongmyo Shrine, Jogyesa is an active Buddhist temple and often includes lanterns and temple decorations."],
+      "contrast_ko": ["종묘처럼 왕실 제례 사당이 아니라, 연등과 법당이 보이는 불교 사찰이다."]
+    },
+    {
+      "landmark_id": "jongmyo_shrine",
+      "aliases_en": ["Jongmyo Shrine", "Royal Ancestral Shrine", "Joseon royal shrine", "UNESCO Jongmyo"],
+      "aliases_ko": ["종묘", "왕실 사당", "조선 왕실 사당", "유네스코 종묘", "종묘제례"],
+      "user_queries_en": ["royal ancestral shrine", "long red shrine building", "Joseon kings and queens shrine"],
+      "user_queries_ko": ["왕과 왕비의 신주를 모신 곳", "조선 왕실 사당", "긴 붉은 사당 건물", "유네스코 사당"],
+      "visual_features_en": ["A long, restrained royal shrine with red wooden columns, a broad stone courtyard, and a low tiled roof line."],
+      "visual_features_ko": ["긴 붉은 목조 기둥과 넓은 석재 마당, 낮고 길게 이어진 기와지붕이 특징인 왕실 사당이다."],
+      "contrast_en": ["Unlike palace gates, Jongmyo is a long shrine building and courtyard, not a gate with arched entrances."],
+      "contrast_ko": ["궁궐 문처럼 아치형 출입구가 있는 문이 아니라, 긴 사당 건물과 넓은 마당이 중심이다."]
+    },
+    {
+      "landmark_id": "mmca_seoul",
+      "aliases_en": ["MMCA Seoul", "National Museum of Modern and Contemporary Art Seoul", "modern art museum", "contemporary art museum", "art gallery"],
+      "aliases_ko": ["국립현대미술관 서울", "국립현대미술관", "현대미술관", "미술관", "전시관", "갤러리"],
+      "user_queries_en": ["art gallery", "modern art museum", "contemporary art exhibition", "museum near Gyeongbokgung"],
+      "user_queries_ko": ["미술관", "현대미술 전시", "국립현대미술관 서울관", "경복궁 옆 미술관", "전시 보는 곳"],
+      "visual_features_en": ["A modern museum complex near Gyeongbokgung with contemporary exhibition spaces, museum signs, courtyards, and brick or modern facades."],
+      "visual_features_ko": ["경복궁 인근의 현대미술관으로, 전시 공간과 미술관 표지, 마당, 현대적인 외관이 특징이다."],
+      "contrast_en": ["Unlike palaces and shrines, MMCA Seoul is a museum or gallery, often recognized by modern architecture and exhibition signage."],
+      "contrast_ko": ["궁궐이나 사당이 아니라 현대미술 전시를 위한 미술관이며, 전시 표지와 현대적인 외관이 핵심 단서다."]
+    },
+    {
+      "landmark_id": "myeongdong_cathedral",
+      "aliases_en": ["Myeongdong Cathedral", "Myeongdong Catholic Cathedral", "Gothic cathedral", "Catholic church in Myeongdong"],
+      "aliases_ko": ["명동성당", "명동 대성당", "천주교 성당", "고딕 성당"],
+      "user_queries_en": ["Gothic church in Seoul", "Catholic cathedral with tall brick tower", "Myeongdong church"],
+      "user_queries_ko": ["명동에 있는 성당", "고딕 양식 성당", "벽돌 성당", "천주교 주교좌성당"],
+      "visual_features_en": ["A red brick Gothic Catholic cathedral with a pointed bell tower, arched windows, and church facade."],
+      "visual_features_ko": ["붉은 벽돌과 뾰족한 종탑, 아치형 창문이 보이는 고딕 양식의 천주교 성당이다."],
+      "contrast_en": ["Unlike traditional Korean palaces, it is a brick Gothic church with a tall pointed tower."],
+      "contrast_ko": ["전통 궁궐이나 사찰이 아니라 벽돌과 높은 첨탑이 있는 고딕 성당이다."]
+    },
+    {
+      "landmark_id": "naksan_park",
+      "aliases_en": ["Naksan Park", "Seoul City Wall park", "Hanyangdoseong trail", "stone wall park", "fortress wall park", "city wall night view"],
+      "aliases_ko": ["낙산공원", "낙산", "한양도성", "서울성곽", "성곽길", "돌담있는곳", "성벽 야경"],
+      "user_queries_en": ["stone wall trail overlooking Seoul", "fortress wall night view", "city wall park on a hill", "Seoul wall walking path"],
+      "user_queries_ko": ["돌담있는곳", "성곽 야경", "서울 도심이 보이는 성곽길", "한양도성 산책로", "성벽 있는 공원"],
+      "visual_features_en": ["A hilltop park following the Seoul City Wall, with long stone fortress walls, walking paths, city views, and night scenery."],
+      "visual_features_ko": ["서울 도심이 내려다보이는 언덕 공원으로, 길게 이어진 돌 성벽과 산책로, 야경이 특징이다."],
+      "contrast_en": ["Unlike Gwanghwamun, the key cue is a long stone wall and walking path rather than a large palace gate."],
+      "contrast_ko": ["광화문처럼 큰 궁궐 정문이 아니라, 길게 이어진 돌 성벽과 산책로가 핵심이다."]
+    },
+    {
+      "landmark_id": "statue_of_king_sejong",
+      "aliases_en": ["Statue of King Sejong", "King Sejong statue", "bronze seated statue", "Gwanghwamun Square statue"],
+      "aliases_ko": ["세종대왕 동상", "세종대왕상", "광화문 세종대왕", "청동 좌상", "큰 세종대왕 동상"],
+      "user_queries_en": ["large bronze statue of King Sejong", "seated king statue in Gwanghwamun Square", "Korean king statue"],
+      "user_queries_ko": ["큰 세종대왕 동상", "광화문광장 청동상", "앉아있는 왕 동상", "한글 만든 왕 동상"],
+      "visual_features_en": ["A large bronze seated statue of King Sejong in Gwanghwamun Square, often shown with a broad plaza and city background."],
+      "visual_features_ko": ["광화문광장에 있는 큰 청동 좌상으로, 세종대왕이 앉아 있는 모습과 넓은 광장이 특징이다."],
+      "contrast_en": ["Unlike palace buildings, the main subject is a bronze human statue rather than architecture."],
+      "contrast_ko": ["궁궐 건축물이 아니라 사람 형상의 청동 동상이 주 피사체다."]
+    }
+  ]
+}

@@ -4,6 +4,8 @@ __pycache__/
 *.pyo
 *.pt
 *.onnx
+*.onnx.data
+mobile_artifacts*/
 logs/
 .pytest_cache/
 .streamlit/secrets.toml

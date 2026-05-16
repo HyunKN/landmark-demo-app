@@ -104,12 +104,12 @@
       "landmark_id": "mmca_seoul",
       "name_ko": "국립현대미술관 서울",
       "name_en": "MMCA Seoul",
-      "aliases": ["국립현대미술관", "MMCA", "현대미술관 서울관"],
+      "aliases": ["국립현대미술관", "MMCA", "현대미술관 서울관", "art gallery", "art museum", "modern art museum", "contemporary art museum"],
       "description_ko": "국립현대미술관 서울관은 2013년 경복궁 옆 옛 기무사 부지에 개관했습니다. 한국 근현대 미술과 동시대 미술을 전시합니다.",
       "latitude": 37.5790,
       "longitude": 126.9803,
       "hero_image_path": "hero_images/mmca_seoul.jpg",
-      "tags": ["미술관", "현대미술", "박물관"]
+      "tags": ["미술관", "현대미술", "박물관", "전시", "갤러리", "art gallery", "art museum", "modern art", "contemporary art", "exhibition"]
     },
     {
       "landmark_id": "myeongdong_cathedral",
@@ -126,12 +126,12 @@
       "landmark_id": "naksan_park",
       "name_ko": "낙산공원",
       "name_en": "Naksan Park",
-      "aliases": ["낙산공원", "Naksan"],
+      "aliases": ["낙산공원", "Naksan", "한양도성", "서울성곽", "돌담있는곳", "stone wall park", "fortress wall park", "city wall park"],
       "description_ko": "낙산공원은 한양도성 성곽길을 따라 조성된 공원입니다. 종로구 동쪽 낙산 자락에 위치하며 서울 도심 야경 명소로 알려져 있습니다.",
       "latitude": 37.5800,
       "longitude": 127.0078,
       "hero_image_path": "hero_images/naksan_park.jpg",
-      "tags": ["공원", "성곽", "야경"]
+      "tags": ["공원", "성곽", "성벽", "돌담", "한양도성", "서울성곽", "야경", "stone wall", "fortress wall", "city wall", "night view"]
     },
     {
       "landmark_id": "statue_of_king_sejong",

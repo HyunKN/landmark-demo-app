@@ -1,0 +1,297 @@
+{
+  "version": "demo-regression-v1",
+  "created_at": "2026-05-16",
+  "notes": "Manual image cases reference frozen inputs under assets/regression_inputs/. Regenerate via scripts/freeze_regression_inputs.py.",
+  "text_cases": [
+    {
+      "id": "text-mmca-en-art-gallery",
+      "query": "art gallery",
+      "expected_top1": "mmca_seoul",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "text-naksan-ko-stone-wall-compact",
+      "query": "돌담있는곳",
+      "expected_top1": "naksan_park",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "text-jongmyo-en-alias",
+      "query": "Royal Ancestral Shrine",
+      "expected_top1": "jongmyo_shrine",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "text-mmca-ko",
+      "query": "미술관",
+      "expected_top1": "mmca_seoul",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    }
+  ],
+  "image_policy_cases": [
+    {
+      "id": "image-ambiguous-low-margin",
+      "scores": [
+        0.351,
+        0.257,
+        0.213
+      ],
+      "expected_decision": "ambiguous"
+    },
+    {
+      "id": "image-out-of-scope-weak-screenshot-like",
+      "scores": [
+        0.326,
+        0.251,
+        0.214
+      ],
+      "expected_decision": "out_of_scope"
+    },
+    {
+      "id": "image-matched-clear",
+      "scores": [
+        0.789,
+        0.074,
+        0.057
+      ],
+      "expected_decision": "matched"
+    }
+  ],
+  "manual_image_cases": [
+    {
+      "id": "positive-bohyunsanshingak",
+      "input_hint": "assets/regression_inputs/positive/bohyunsanshingak.jpg",
+      "expected_top1": "bohyunsanshingak",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "positive-changgyeonggung",
+      "input_hint": "assets/regression_inputs/positive/changgyeonggung.jpg",
+      "expected_top1": "changgyeonggung",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "positive-cheonggyecheon",
+      "input_hint": "assets/regression_inputs/positive/cheonggyecheon.jpg",
+      "expected_top1": "cheonggyecheon",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "positive-cheongwadae",
+      "input_hint": "assets/regression_inputs/positive/cheongwadae.jpg",
+      "expected_top1": "cheongwadae",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "positive-deoksugung",
+      "input_hint": "assets/regression_inputs/positive/deoksugung.jpg",
+      "expected_top1": "deoksugung",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "positive-gwanghwamun",
+      "input_hint": "assets/regression_inputs/positive/gwanghwamun.jpg",
+      "expected_top1": "gwanghwamun",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "positive-gyeongbokgung_geunjeongmun",
+      "input_hint": "assets/regression_inputs/positive/gyeongbokgung_geunjeongmun.jpg",
+      "expected_top1": "gyeongbokgung_geunjeongmun",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "positive-jogyesa",
+      "input_hint": "assets/regression_inputs/positive/jogyesa.jpg",
+      "expected_top1": "jogyesa",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "positive-jongmyo_shrine",
+      "input_hint": "assets/regression_inputs/positive/jongmyo_shrine.jpg",
+      "expected_top1": "jongmyo_shrine",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "positive-mmca_seoul",
+      "input_hint": "assets/regression_inputs/positive/mmca_seoul.jpg",
+      "expected_top1": "mmca_seoul",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "positive-myeongdong_cathedral",
+      "input_hint": "assets/regression_inputs/positive/myeongdong_cathedral.jpg",
+      "expected_top1": "myeongdong_cathedral",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "positive-naksan_park",
+      "input_hint": "assets/regression_inputs/positive/naksan_park.jpg",
+      "expected_top1": "naksan_park",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "positive-statue_of_king_sejong",
+      "input_hint": "assets/regression_inputs/positive/statue_of_king_sejong.jpg",
+      "expected_top1": "statue_of_king_sejong",
+      "expected_decision": [
+        "matched",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "out-of-scope-screen-capture-synthetic",
+      "input_hint": "assets/regression_inputs/out_of_scope/screen_capture_synthetic.png",
+      "expected_decision": "out_of_scope"
+    },
+    {
+      "id": "out-of-scope-uniform-noise",
+      "input_hint": "assets/regression_inputs/out_of_scope/uniform_noise.jpg",
+      "expected_decision": "out_of_scope"
+    }
+  ],
+  "hard_image_cases": [
+    {
+      "id": "hard-gwanghwamun-wide-with-bluehouse-background",
+      "input_hint": "assets/regression_inputs/hard_cases/gwanghwamun_wide_with_bluehouse_background.jpg",
+      "expected_primary": "gwanghwamun",
+      "allowed_top3": ["gwanghwamun", "gyeongbokgung_geunjeongmun", "cheongwadae"],
+      "forbidden_matched": ["cheongwadae"],
+      "expected_decision": ["ambiguous", "out_of_scope"],
+      "notes": "Wide mixed palace scene: Gwanghwamun foreground, Gyeongbokgung midground, Cheongwadae/Bugaksan background. It must not be shown as a confident Cheongwadae match."
+    },
+    {
+      "id": "hard-gwanghwamun-wide-no-top-40pct",
+      "input_hint": "assets/regression_inputs/hard_cases/gwanghwamun_wide_no_top_40pct.jpg",
+      "expected_primary": "gwanghwamun",
+      "allowed_top3": ["gwanghwamun", "gyeongbokgung_geunjeongmun", "cheongwadae", "changgyeonggung"],
+      "forbidden_matched": ["cheongwadae"],
+      "expected_decision": ["ambiguous", "out_of_scope"],
+      "notes": "Background mountain/Blue House area removed; still a wide palace-scene confusion case."
+    },
+    {
+      "id": "hard-gwanghwamun-left-gate-focus",
+      "input_hint": "assets/regression_inputs/hard_cases/gwanghwamun_left_gate_focus.jpg",
+      "expected_top1": "gwanghwamun",
+      "expected_decision": ["matched", "ambiguous"],
+      "notes": "Object-focused crop should recover Gwanghwamun."
+    }
+  ],
+  "frozen_at": "2026-05-16",
+  "frozen_positive_sources": [
+    {
+      "landmark_id": "bohyunsanshingak",
+      "source": "Dataset\\bohyunsanshingak\\images\\HF010584_0000_0002.jpg",
+      "frozen_at": "assets\\regression_inputs\\positive\\bohyunsanshingak.jpg"
+    },
+    {
+      "landmark_id": "changgyeonggung",
+      "source": "Dataset\\changgyeonggung\\images\\HF010511_0000_0116.jpg",
+      "frozen_at": "assets\\regression_inputs\\positive\\changgyeonggung.jpg"
+    },
+    {
+      "landmark_id": "cheonggyecheon",
+      "source": "Dataset\\cheonggyecheon\\images\\00020_7504e2fb2d8e.jpg",
+      "frozen_at": "assets\\regression_inputs\\positive\\cheonggyecheon.jpg"
+    },
+    {
+      "landmark_id": "cheongwadae",
+      "source": "Dataset\\cheongwadae\\images\\10.jpg",
+      "frozen_at": "assets\\regression_inputs\\positive\\cheongwadae.jpg"
+    },
+    {
+      "landmark_id": "deoksugung",
+      "source": "Dataset\\deoksugung\\images\\HF010625_0002_0002.jpg",
+      "frozen_at": "assets\\regression_inputs\\positive\\deoksugung.jpg"
+    },
+    {
+      "landmark_id": "gwanghwamun",
+      "source": "Dataset\\gwanghwamun\\images\\gwanghwamun_11.jpg",
+      "frozen_at": "assets\\regression_inputs\\positive\\gwanghwamun.jpg"
+    },
+    {
+      "landmark_id": "gyeongbokgung_geunjeongmun",
+      "source": "Dataset\\gyeongbokgung_geunjeongmun\\images\\geunjeongmun_1.jpg",
+      "frozen_at": "assets\\regression_inputs\\positive\\gyeongbokgung_geunjeongmun.jpg"
+    },
+    {
+      "landmark_id": "jogyesa",
+      "source": "Dataset\\jogyesa\\images\\HF010580_0000_0267.jpg",
+      "frozen_at": "assets\\regression_inputs\\positive\\jogyesa.jpg"
+    },
+    {
+      "landmark_id": "jongmyo_shrine",
+      "source": "Dataset\\jongmyo_shrine\\images\\HF010549_0000_0002.jpg",
+      "frozen_at": "assets\\regression_inputs\\positive\\jongmyo_shrine.jpg"
+    },
+    {
+      "landmark_id": "mmca_seoul",
+      "source": "Dataset\\mmca_seoul\\images\\00010_b10bd1defcd5.jpg",
+      "frozen_at": "assets\\regression_inputs\\positive\\mmca_seoul.jpg"
+    },
+    {
+      "landmark_id": "myeongdong_cathedral",
+      "source": "Dataset\\myeongdong_cathedral\\images\\00004_94daa88f4e7b.jpg",
+      "frozen_at": "assets\\regression_inputs\\positive\\myeongdong_cathedral.jpg"
+    },
+    {
+      "landmark_id": "naksan_park",
+      "source": "Dataset\\naksan_park\\images\\00007_8060b94d6666.jpg",
+      "frozen_at": "assets\\regression_inputs\\positive\\naksan_park.jpg"
+    },
+    {
+      "landmark_id": "statue_of_king_sejong",
+      "source": "Dataset\\statue_of_king_sejong\\images\\00003_645e60246195.jpg",
+      "frozen_at": "assets\\regression_inputs\\positive\\statue_of_king_sejong.jpg"
+    }
+  ],
+  "frozen_missing": []
+}

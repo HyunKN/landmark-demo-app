@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import time
+from dataclasses import dataclass
 from typing import Iterable
 
 import numpy as np
@@ -11,6 +12,16 @@ from PIL import Image
 
 
 SUPPORTED_FORMATS = {"JPEG", "JPG", "PNG", "WEBP"}
+
+
+@dataclass
+class ImageQualityReport:
+    ok: bool
+    reason_codes: list[str]
+    min_side: int
+    brightness: float
+    contrast: float
+    sharpness: float
 
 
 class ImageRecognizer:
@@ -86,3 +97,36 @@ def validate_image_file(filename: str, size_bytes: int, max_mb: int = 10) -> tup
     if size_bytes > max_mb * 1024 * 1024:
         return False, f"{max_mb}MB 이하 이미지만 지원합니다"
     return True, ""
+
+
+def assess_image_quality(image: Image.Image) -> ImageQualityReport:
+    """가벼운 품질 휴리스틱. 모바일 시연용 안내에만 사용하고 학습 평가는 대체하지 않는다."""
+    rgb = image.convert("RGB")
+    w, h = rgb.size
+    min_side = min(w, h)
+    gray = np.asarray(rgb.convert("L"), dtype=np.float32)
+    brightness = float(gray.mean())
+    contrast = float(gray.std())
+    gy, gx = np.gradient(gray)
+    sharpness = float(np.mean(gx * gx + gy * gy))
+
+    reasons: list[str] = []
+    if min_side < 128:
+        reasons.append("too_small")
+    if brightness < 25.0:
+        reasons.append("too_dark")
+    if brightness > 245.0 and contrast < 10.0:
+        reasons.append("too_bright")
+    if contrast < 5.0:
+        reasons.append("low_contrast")
+    if sharpness < 1.5 and min_side >= 128:
+        reasons.append("blur_detected")
+
+    return ImageQualityReport(
+        ok=len(reasons) == 0,
+        reason_codes=reasons,
+        min_side=min_side,
+        brightness=round(brightness, 2),
+        contrast=round(contrast, 2),
+        sharpness=round(sharpness, 2),
+    )

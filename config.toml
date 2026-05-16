@@ -13,6 +13,15 @@ reject_threshold = 0.25
 image_only = { w_image = 1.0, w_text = 0.0, w_keyword = 0.0 }
 text_only = { w_image = 0.0, w_text = 0.6, w_keyword = 0.4 }
 
+[policy]
+reject_threshold = 0.25
+weak_reject_threshold = 0.35
+weak_margin = 0.12
+match_threshold = 0.60
+match_floor = 0.50
+match_margin = 0.20
+text_no_keyword_reject_threshold = 0.35
+
 [ui]
 title = "Jongno Landmark Demo"
 max_image_mb = 10

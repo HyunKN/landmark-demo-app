@@ -20,6 +20,7 @@ class AppConfig:
     inference_backend: str
     warmup_on_start: bool
     reject_threshold: float
+    policy: dict
     image_only: dict           # FusionWeights kwargs
     text_only: dict
     max_image_mb: int
@@ -32,6 +33,7 @@ def load_config(path: str) -> AppConfig:
     paths = raw.get("paths", {})
     runtime = raw.get("runtime", {})
     fusion = raw.get("fusion", {})
+    policy = raw.get("policy", {})
     ui = raw.get("ui", {})
     return AppConfig(
         assets_dir=paths.get("assets_dir", "./assets"),
@@ -41,6 +43,15 @@ def load_config(path: str) -> AppConfig:
         inference_backend=runtime.get("inference_backend", "pytorch"),
         warmup_on_start=runtime.get("warmup_on_start", True),
         reject_threshold=float(fusion.get("reject_threshold", 0.25)),
+        policy={
+            "reject_threshold": float(policy.get("reject_threshold", fusion.get("reject_threshold", 0.25))),
+            "weak_reject_threshold": float(policy.get("weak_reject_threshold", 0.35)),
+            "weak_margin": float(policy.get("weak_margin", 0.12)),
+            "match_threshold": float(policy.get("match_threshold", 0.60)),
+            "match_floor": float(policy.get("match_floor", 0.50)),
+            "match_margin": float(policy.get("match_margin", 0.20)),
+            "text_no_keyword_reject_threshold": float(policy.get("text_no_keyword_reject_threshold", 0.35)),
+        },
         image_only=fusion.get("image_only", {"w_image": 1.0, "w_text": 0.0, "w_keyword": 0.0}),
         text_only=fusion.get("text_only", {"w_image": 0.0, "w_text": 0.6, "w_keyword": 0.4}),
         max_image_mb=int(ui.get("max_image_mb", 10)),

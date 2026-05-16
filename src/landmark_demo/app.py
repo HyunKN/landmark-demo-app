@@ -13,11 +13,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from landmark_demo.config import load_config
 from landmark_demo.data import LANDMARK_CATALOG, load_asset_bundle
-from landmark_demo.inference import ImageRecognizer, TextEncoder, validate_image_file
+from landmark_demo.inference import ImageRecognizer, TextEncoder, assess_image_quality, validate_image_file
 from landmark_demo.logging_util import DebugLogger
 from landmark_demo.model import load_checkpoint
 from landmark_demo.search import (
+    ConfidencePolicy,
     FusionWeights,
+    apply_decision_policy,
     name_search,
     search_by_image,
     search_by_text,
@@ -72,14 +74,61 @@ def boot(config_path: str):
     }
 
 
+def _outcome_log_extra(outcome, policy: ConfidencePolicy, model_version: str, quality_report=None) -> dict:
+    extra = {
+        "policy_version": "sprint1-reliability-v1",
+        "decision": outcome.decision,
+        "reason_codes": outcome.reason_codes,
+        "top1_score": outcome.top1_score,
+        "top2_score": outcome.top2_score,
+        "margin": outcome.margin,
+        "thresholds": {
+            "reject_threshold": policy.reject_threshold,
+            "weak_reject_threshold": policy.weak_reject_threshold,
+            "weak_margin": policy.weak_margin,
+            "match_threshold": policy.match_threshold,
+            "match_floor": policy.match_floor,
+            "match_margin": policy.match_margin,
+            "text_no_keyword_reject_threshold": policy.text_no_keyword_reject_threshold,
+        },
+        "model_version": model_version,
+    }
+    if quality_report is not None:
+        extra["quality"] = {
+            "ok": quality_report.ok,
+            "reason_codes": quality_report.reason_codes,
+            "min_side": quality_report.min_side,
+            "brightness": quality_report.brightness,
+            "contrast": quality_report.contrast,
+            "sharpness": quality_report.sharpness,
+        }
+    return extra
+
+
 def render_top3(outcome, bundle, key_prefix: str) -> None:
-    if outcome.below_threshold and not st.session_state.get(f"{key_prefix}_show_below", False):
-        st.warning("범위 외 입력으로 판단됩니다.")
-        if st.button("후보 보기", key=f"{key_prefix}_toggle_below"):
+    show_key = f"{key_prefix}_show_low_confidence"
+    if outcome.decision == "out_of_scope" and not st.session_state.get(show_key, False):
+        st.warning("지원 범위의 종로 랜드마크로 확인되지 않았습니다.")
+        st.caption("원하면 내부 점수 기준의 가까운 후보를 확인할 수 있지만, 확정 결과로 보지는 않습니다.")
+        if st.button("후보 참고용으로 보기", key=f"{key_prefix}_toggle_out"):
             st.session_state[f"{key_prefix}_show_below"] = True
+            st.session_state[show_key] = True
             st.rerun()
         return
 
+    if outcome.decision == "low_quality" and not st.session_state.get(show_key, False):
+        st.warning("사진 품질이 낮아 판별하기 어렵습니다. 더 밝고 선명한 사진으로 다시 시도해 주세요.")
+        if st.button("후보 참고용으로 보기", key=f"{key_prefix}_toggle_quality"):
+            st.session_state[show_key] = True
+            st.rerun()
+        return
+
+    if outcome.decision == "ambiguous":
+        st.info("한 곳으로 확정하기 어렵습니다. 가까운 후보를 함께 보여드립니다.")
+    elif outcome.decision == "low_quality":
+        st.warning("품질 이슈가 있어 참고용 후보로 표시합니다.")
+
+    st.caption("표시된 %는 정답 확률이 아니라 모델 유사도 점수를 사용자용으로 변환한 값입니다.")
     cols = st.columns(min(3, max(1, len(outcome.top3))))
     for col, item in zip(cols, outcome.top3):
         info = bundle.info_by_id.get(item.landmark_id)
@@ -155,6 +204,8 @@ def main() -> None:
     cfg = state["config"]
     bundle = state["bundle"]
     asset_dir = state["asset_dir"]
+    policy = ConfidencePolicy(**cfg.policy)
+    model_version = Path(cfg.checkpoint).name
 
     if state.get("warnings"):
         with st.sidebar.expander("자산 경고", expanded=False):
@@ -164,7 +215,7 @@ def main() -> None:
     # ---- Sidebar ----
     st.sidebar.title("Landmark Demo")
     st.sidebar.caption(f"device: `{state['device']}`")
-    st.sidebar.caption(f"backend: pytorch")
+    st.sidebar.caption(f"backend: {cfg.inference_backend}")
     dev_mode = st.sidebar.toggle("개발자 모드", value=False)
     st.sidebar.divider()
     if st.sidebar.button("모든 검색 초기화"):
@@ -200,11 +251,22 @@ def main() -> None:
                 from PIL import Image
                 pil_img = Image.open(io.BytesIO(uploaded.read())).convert("RGB")
                 st.image(pil_img, caption=uploaded.name, use_container_width=False, width=320)
+                quality_report = assess_image_quality(pil_img)
+                if not quality_report.ok:
+                    st.caption(f"품질 경고: {', '.join(quality_report.reason_codes)}")
                 with st.spinner("추론 중..."):
                     embedding, elapsed_ms = state["recognizer"].encode(pil_img)
                 weights = FusionWeights(**cfg.image_only)
                 weights.validate()
-                outcome = search_by_image(embedding, bundle, weights, cfg.reject_threshold)
+                outcome = search_by_image(embedding, bundle, weights, cfg.reject_threshold, policy=policy)
+                if not quality_report.ok:
+                    outcome = apply_decision_policy(
+                        outcome,
+                        "image",
+                        policy,
+                        low_quality=True,
+                        quality_reason_codes=quality_report.reason_codes,
+                    )
                 st.caption(f"처리 시간: {elapsed_ms} ms")
                 if elapsed_ms > cfg.slow_inference_ms:
                     st.warning("추론이 지연되고 있습니다.")
@@ -213,6 +275,7 @@ def main() -> None:
                     below_threshold=outcome.below_threshold,
                     top3=[{"landmark_id": t.landmark_id, "fusion_score": t.fusion_score, "rank": t.rank} for t in outcome.top3],
                     scores=outcome.all_scores,
+                    extra=_outcome_log_extra(outcome, policy, model_version, quality_report),
                 )
                 last_outcome = outcome
                 st.session_state["last_outcome"] = outcome
@@ -241,12 +304,13 @@ def main() -> None:
                         st.warning(f"텍스트 인코더 실패: {exc}")
                 weights = FusionWeights(**cfg.text_only)
                 weights.validate()
-                outcome = search_by_text(text_embedding, stripped, bundle, weights, cfg.reject_threshold)
+                outcome = search_by_text(text_embedding, stripped, bundle, weights, cfg.reject_threshold, policy=policy)
                 state["logger"].log(
                     kind="text", input_id=stripped[:80], elapsed_ms=0,
                     below_threshold=outcome.below_threshold,
                     top3=[{"landmark_id": t.landmark_id, "fusion_score": t.fusion_score, "rank": t.rank} for t in outcome.top3],
                     scores=outcome.all_scores,
+                    extra=_outcome_log_extra(outcome, policy, model_version),
                 )
                 last_outcome = outcome
                 st.session_state["last_outcome"] = outcome
@@ -261,6 +325,20 @@ def main() -> None:
                 st.info("검색 결과 없음")
             else:
                 st.caption(f"{len(result.matches)}개 후보")
+                state["logger"].log(
+                    kind="name",
+                    input_id=name_query.strip()[:80],
+                    elapsed_ms=0,
+                    below_threshold=False,
+                    top3=[{"landmark_id": entry.landmark_id, "rank": idx + 1} for idx, entry in enumerate(result.matches[:3])],
+                    scores={},
+                    extra={
+                        "policy_version": "sprint1-reliability-v1",
+                        "decision": "name_lookup",
+                        "reason_codes": ["name_partial_match"],
+                        "model_version": model_version,
+                    },
+                )
                 for entry in result.matches:
                     info = bundle.info_by_id.get(entry.landmark_id)
                     label = f"**{info.name_ko}** · {entry.display} ({entry.kind})" if info else entry.display
