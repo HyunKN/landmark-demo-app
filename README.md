@@ -42,16 +42,16 @@ python scripts/build_assets.py ^
 
 ### 3. 데모 실행
 
-| 명령 | 가중치 |
-|---|---|
-| `python run.py` | `best.pt` (PyTorch FP32, 기본) |
-| `python run.py --int8` | `mobile_artifacts_int8/landmark_encoder.onnx` (ONNX INT8) |
+| 명령 | 가중치 | 필요 의존성 |
+|---|---|---|
+| `python run.py` | `best.pt` (PyTorch FP32, 기본) | `pip install -e .` |
+| `python run.py --int8` | `mobile_artifacts_int8/landmark_encoder.onnx` (ONNX INT8) | `pip install -e .[onnx]` |
 
 ```bash
 # PyTorch 기본 (권장)
 python run.py
 
-# INT8 ONNX
+# INT8 ONNX (onnxruntime 필요: pip install -e .[onnx])
 python run.py --int8
 ```
 
