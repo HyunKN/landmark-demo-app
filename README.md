@@ -48,6 +48,30 @@ python run.py
 
 브라우저에서 자동 열리는 `http://localhost:8501` 접속.
 
+### 4. ONNX로 실행/비교
+
+일반 데모는 `best.pt`를 PyTorch로 직접 로드한다. export 결과와 성능 차이를 보고 싶으면 ONNX artifact를 만든 뒤 ONNX config로 실행한다.
+
+```powershell
+pip install -e .[onnx]
+
+python scripts\export_mobile_onnx.py ^
+  --checkpoint .\best.pt ^
+  --assets-dir .\assets ^
+  --output-dir .\mobile_artifacts
+
+python scripts\benchmark_mobile_artifact.py ^
+  --checkpoint .\best.pt ^
+  --assets-dir .\assets ^
+  --artifact-dir .\mobile_artifacts ^
+  --runs 5
+
+$env:LANDMARK_DEMO_CONFIG = ".\config.onnx.toml"
+python run.py
+```
+
+ONNX config에서는 이미지 인식 경로가 ONNX Runtime CPU로 실행된다. 자연어 검색은 `best.pt`가 있으면 PyTorch text tower를 보조로 쓰고, 없으면 keyword/text-index 중심으로 동작한다.
+
 ## 폴더 구조
 
 ```
@@ -55,6 +79,7 @@ landmark-demo-app/
 ├── README.md
 ├── pyproject.toml
 ├── config.toml                          # 가중치, threshold, 경로
+├── config.onnx.toml                     # ONNX Runtime 실행 설정
 ├── best.pt                              # 학습 체크포인트 (gitignore)
 ├── run.py                               # streamlit launcher
 ├── assets/                              # 빌드 산출물 (gitignore)

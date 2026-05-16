@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from landmark_demo.config import load_config
 from landmark_demo.data import LANDMARK_CATALOG, load_asset_bundle
-from landmark_demo.inference import ImageRecognizer, TextEncoder, assess_image_quality, validate_image_file
+from landmark_demo.inference import ImageRecognizer, OnnxImageRecognizer, TextEncoder, assess_image_quality, validate_image_file
 from landmark_demo.logging_util import DebugLogger
 from landmark_demo.model import load_checkpoint
 from landmark_demo.search import (
@@ -41,21 +41,33 @@ def boot(config_path: str):
     if device == "auto":
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    model, classes, train_cfg = load_checkpoint(cfg.checkpoint, device=device)
-    image_size = int(train_cfg["training"]["image_size"])
-    image_mean = list(train_cfg["training"]["image_mean"])
-    image_std = list(train_cfg["training"]["image_std"])
-
-    recognizer = ImageRecognizer(model, image_size, image_mean, image_std, device=device)
+    model = None
+    classes = list(LANDMARK_CATALOG)
+    train_cfg = None
+    if cfg.inference_backend == "onnx":
+        recognizer = OnnxImageRecognizer(cfg.mobile_artifact_dir)
+        device = "onnxruntime-cpu"
+    else:
+        model, classes, train_cfg = load_checkpoint(cfg.checkpoint, device=device)
+        image_size = int(train_cfg["training"]["image_size"])
+        image_mean = list(train_cfg["training"]["image_mean"])
+        image_std = list(train_cfg["training"]["image_std"])
+        recognizer = ImageRecognizer(model, image_size, image_mean, image_std, device=device)
 
     # Text encoder (선택적)
     text_encoder = None
-    try:
-        import open_clip
-        tokenizer = open_clip.get_tokenizer(train_cfg["model"]["model_name"])
-        text_encoder = TextEncoder(model, tokenizer, device=device)
-    except Exception as exc:
-        print(f"[boot] text encoder unavailable: {exc}")
+    if cfg.inference_backend == "onnx":
+        try:
+            model, _classes, train_cfg = load_checkpoint(cfg.checkpoint, device="cpu")
+        except Exception as exc:
+            print(f"[boot] text encoder unavailable in onnx mode: {exc}")
+    if model is not None and train_cfg is not None:
+        try:
+            import open_clip
+            tokenizer = open_clip.get_tokenizer(train_cfg["model"]["model_name"])
+            text_encoder = TextEncoder(model, tokenizer, device="cpu" if cfg.inference_backend == "onnx" else device)
+        except Exception as exc:
+            print(f"[boot] text encoder unavailable: {exc}")
 
     logger = DebugLogger(Path(cfg.log_path))
 
@@ -71,6 +83,7 @@ def boot(config_path: str):
         "device": device,
         "logger": logger,
         "warnings": asset_result.errors,
+        "inference_backend": cfg.inference_backend,
     }
 
 

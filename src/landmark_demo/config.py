@@ -16,6 +16,7 @@ class AppConfig:
     assets_dir: str
     log_path: str
     checkpoint: str
+    mobile_artifact_dir: str
     device: str
     inference_backend: str
     warmup_on_start: bool
@@ -39,6 +40,7 @@ def load_config(path: str) -> AppConfig:
         assets_dir=paths.get("assets_dir", "./assets"),
         log_path=paths.get("log_path", "./logs/demo.jsonl"),
         checkpoint=paths.get("checkpoint", "./best.pt"),
+        mobile_artifact_dir=paths.get("mobile_artifact_dir", "./mobile_artifacts"),
         device=runtime.get("device", "auto"),
         inference_backend=runtime.get("inference_backend", "pytorch"),
         warmup_on_start=runtime.get("warmup_on_start", True),

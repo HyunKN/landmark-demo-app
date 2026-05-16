@@ -1,12 +1,12 @@
 [paths]
 assets_dir = "./assets"
-log_path = "./logs/demo.jsonl"
+log_path = "./logs/demo_onnx.jsonl"
 checkpoint = "./best.pt"
 mobile_artifact_dir = "./mobile_artifacts"
 
 [runtime]
-device = "auto"  # "auto", "cuda", "cpu"
-inference_backend = "pytorch"  # "pytorch" 또는 "onnx"
+device = "cpu"
+inference_backend = "onnx"
 warmup_on_start = true
 
 [fusion]
@@ -24,6 +24,6 @@ match_margin = 0.20
 text_no_keyword_reject_threshold = 0.35
 
 [ui]
-title = "Jongno Landmark Demo"
+title = "Jongno Landmark Demo (ONNX)"
 max_image_mb = 10
 slow_inference_ms = 5000
