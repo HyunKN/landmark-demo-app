@@ -1,6 +1,6 @@
 # landmark-demo-app
 
-종로구 13개 랜드마크 인식 데모 앱. 학습된 MobileCLIP2-S4 체크포인트(`best.pt`)를 그대로 로드해 Streamlit UI에서 이미지/자연어/이름 3가지 검색을 시연한다.
+종로구 13개 랜드마크 인식 데모 앱. 학습된 MobileCLIP2-S4 체크포인트(`best.pt`) 또는 export된 ONNX/INT8 artifact로 Streamlit UI에서 이미지/자연어/이름 3가지 검색을 시연한다.
 
 > 실행 전 주의: `best.pt`는 약 1.7GB라 GitHub git 저장소에 포함하지 않는다. 저장소를 받은 뒤 학습 산출물 `best.pt`를 프로젝트 루트(`landmark-demo-app/best.pt`)에 놓으면 바로 실행할 수 있다.
 
@@ -71,6 +71,14 @@ python run.py --onnx
 
 ONNX config에서는 이미지 인식 경로가 ONNX Runtime CPU로 실행된다. 자연어 검색은 PyTorch checkpoint를 다시 로드하지 않고 keyword/text-index 중심으로 동작한다. 이는 Windows 노트북에서 큰 checkpoint를 중복 로드하며 발생하는 paging file 오류를 피하기 위한 선택이다.
 
+검증된 dynamic INT8 artifact를 받은 경우에는 `mobile_artifacts_int8/` 폴더를 프로젝트 루트에 두고 다음 명령으로 실행한다.
+
+```powershell
+python run.py --int8
+```
+
+팀원 배포용으로는 `mobile_artifacts_int8/` 전체 폴더를 전달한다. `.onnx` 파일만 전달하면 external data와 prototype metadata가 빠져 실행되지 않는다.
+
 ## 폴더 구조
 
 ```
@@ -79,6 +87,7 @@ landmark-demo-app/
 ├── pyproject.toml
 ├── config.toml                          # 가중치, threshold, 경로
 ├── config.onnx.toml                     # ONNX Runtime 실행 설정
+├── config.int8.toml                     # dynamic INT8 ONNX Runtime 실행 설정
 ├── best.pt                              # 학습 체크포인트 (gitignore)
 ├── run.py                               # streamlit launcher
 ├── assets/                              # 빌드 산출물 (gitignore)
@@ -143,6 +152,7 @@ python scripts/benchmark_mobile_artifact.py \
 - `mobile_artifacts/benchmark_report.json`
 
 PC FP32 ONNX Runtime baseline은 external data 포함 약 1.23GB, warm median 약 229ms.
+검증된 dynamic INT8 weight-only artifact는 `mobile_artifacts_int8/`에 두며, external data 포함 약 983MB다. PC 회귀 기준 FP32 대비 top-1 일치율 100%, embedding cosine mean 0.99941, warm median 314ms로 기록했다. Static QDQ 계열은 이전 실험에서 mode collapse가 확인되어 Sprint 1 팀원 배포용으로 쓰지 않는다.
 
 ## Sprint 1 종합 보고서 (동결)
 
