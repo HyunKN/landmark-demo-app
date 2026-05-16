@@ -58,5 +58,5 @@ def load_config(path: str) -> AppConfig:
         text_only=fusion.get("text_only", {"w_image": 0.0, "w_text": 0.6, "w_keyword": 0.4}),
         max_image_mb=int(ui.get("max_image_mb", 10)),
         slow_inference_ms=int(ui.get("slow_inference_ms", 5000)),
-        title=ui.get("title", "Jongno Landmark Demo"),
+        title=ui.get("title", "Landmark Assistant"),
     )

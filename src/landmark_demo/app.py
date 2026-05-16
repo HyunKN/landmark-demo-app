@@ -117,7 +117,7 @@ def _outcome_log_extra(outcome, policy: ConfidencePolicy, model_version: str, qu
 def render_top3(outcome, bundle, key_prefix: str) -> None:
     show_key = f"{key_prefix}_show_low_confidence"
     if outcome.decision == "out_of_scope" and not st.session_state.get(show_key, False):
-        st.warning("지원 범위의 종로 랜드마크로 확인되지 않았습니다.")
+        st.warning("지원 범위의 랜드마크로 확인되지 않았습니다.")
         st.caption("원하면 내부 점수 기준의 가까운 후보를 확인할 수 있지만, 확정 결과로 보지는 않습니다.")
         if st.button("후보 참고용으로 보기", key=f"{key_prefix}_toggle_out"):
             st.session_state[f"{key_prefix}_show_below"] = True
@@ -197,7 +197,7 @@ def render_landmark_page(landmark_id: str, bundle, asset_dir: Path) -> None:
 
 
 def main() -> None:
-    st.set_page_config(page_title="Jongno Landmark Demo", layout="wide")
+    st.set_page_config(page_title="Landmark Assistant", layout="wide")
 
     config_path = os.environ.get("LANDMARK_DEMO_CONFIG", "./config.toml")
     state = boot(config_path)
@@ -222,7 +222,7 @@ def main() -> None:
                 st.write(f"- {w}")
 
     # ---- Sidebar ----
-    st.sidebar.title("Landmark Demo")
+    st.sidebar.title("Landmark Assistant")
     st.sidebar.caption(f"device: `{state['device']}`")
     st.sidebar.caption(f"backend: {cfg.inference_backend}")
     dev_mode = st.sidebar.toggle("개발자 모드", value=False)
@@ -242,8 +242,8 @@ def main() -> None:
         return
 
     # ---- Search page ----
-    st.title("종로 랜드마크 검색 데모")
-    st.caption("MobileCLIP2-S4 기반. 이미지·자연어·이름으로 13개 종로 랜드마크를 검색합니다.")
+    st.title("Landmark Assistant")
+    st.caption("MobileCLIP2-S4 기반. 이미지·자연어·이름으로 지원 범위의 랜드마크를 검색합니다.")
 
     tab_image, tab_text, tab_name = st.tabs(["📷 이미지", "💬 자연어", "🔤 이름"])
 

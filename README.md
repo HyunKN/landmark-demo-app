@@ -1,6 +1,6 @@
-# landmark-demo-app
+# Landmark Assistant
 
-종로구 13개 랜드마크 인식 데모 앱. 학습된 MobileCLIP2-S4 체크포인트(`best.pt`) 또는 export된 ONNX/INT8 artifact로 Streamlit UI에서 이미지/자연어/이름 3가지 검색을 시연한다.
+Landmark Assistant는 지원 범위의 랜드마크를 이미지·자연어·이름으로 검색하는 MobileCLIP2-S4 기반 시연 앱이다. 학습된 체크포인트(`best.pt`) 또는 export된 ONNX/INT8 artifact로 Streamlit UI에서 동작을 시연한다.
 
 > 실행 전 주의: `best.pt`는 약 1.7GB라 GitHub git 저장소에 포함하지 않는다. 저장소를 받은 뒤 학습 산출물 `best.pt`를 프로젝트 루트(`landmark-demo-app/best.pt`)에 놓으면 바로 실행할 수 있다.
 
