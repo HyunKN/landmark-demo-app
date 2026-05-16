@@ -26,8 +26,12 @@ if __name__ == "__main__":
         os.environ["LANDMARK_DEMO_CONFIG"] = str(here / "config.onnx.toml")
     elif args.config:
         os.environ["LANDMARK_DEMO_CONFIG"] = str(Path(args.config).resolve())
+    os.environ.setdefault("STREAMLIT_BROWSER_GATHER_USAGE_STATS", "false")
 
     app = here / "src" / "landmark_demo" / "app.py"
+    config_label = os.environ.get("LANDMARK_DEMO_CONFIG", str(here / "config.toml"))
+    print(f"Starting Landmark Assistant with config: {config_label}", flush=True)
+    print("Open in browser: http://localhost:8501", flush=True)
     cmd = [
         sys.executable,
         "-m",
@@ -38,5 +42,7 @@ if __name__ == "__main__":
         "0.0.0.0",
         "--server.port",
         "8501",
+        "--browser.gatherUsageStats",
+        "false",
     ]
     subprocess.run(cmd, cwd=str(here), check=False)
