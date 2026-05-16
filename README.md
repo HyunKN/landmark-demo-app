@@ -42,11 +42,20 @@ python scripts/build_assets.py ^
 
 ### 3. 데모 실행
 
+| 명령 | 가중치 |
+|---|---|
+| `python run.py` | `best.pt` (PyTorch FP32, 기본) |
+| `python run.py --int8` | `mobile_artifacts_int8/landmark_encoder.onnx` (ONNX INT8) |
+
 ```bash
+# PyTorch 기본 (권장)
 python run.py
+
+# INT8 ONNX
+python run.py --int8
 ```
 
-브라우저에서 자동 열리는 `http://localhost:8501` 접속.
+브라우저에서 `http://localhost:8501` 접속. 종료는 터미널에서 **Ctrl+C**.
 
 ### 4. ONNX로 실행/비교
 
