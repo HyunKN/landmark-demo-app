@@ -54,18 +54,14 @@ def boot(config_path: str):
         image_std = list(train_cfg["training"]["image_std"])
         recognizer = ImageRecognizer(model, image_size, image_mean, image_std, device=device)
 
-    # Text encoder (선택적)
+    # Text encoder (선택적). ONNX mode keeps the app lightweight and avoids
+    # loading the large PyTorch checkpoint again just for text search.
     text_encoder = None
-    if cfg.inference_backend == "onnx":
-        try:
-            model, _classes, train_cfg = load_checkpoint(cfg.checkpoint, device="cpu")
-        except Exception as exc:
-            print(f"[boot] text encoder unavailable in onnx mode: {exc}")
-    if model is not None and train_cfg is not None:
+    if cfg.inference_backend != "onnx" and model is not None and train_cfg is not None:
         try:
             import open_clip
             tokenizer = open_clip.get_tokenizer(train_cfg["model"]["model_name"])
-            text_encoder = TextEncoder(model, tokenizer, device="cpu" if cfg.inference_backend == "onnx" else device)
+            text_encoder = TextEncoder(model, tokenizer, device=device)
         except Exception as exc:
             print(f"[boot] text encoder unavailable: {exc}")
 

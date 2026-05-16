@@ -66,11 +66,10 @@ python scripts\benchmark_mobile_artifact.py ^
   --artifact-dir .\mobile_artifacts ^
   --runs 5
 
-$env:LANDMARK_DEMO_CONFIG = ".\config.onnx.toml"
-python run.py
+python run.py --onnx
 ```
 
-ONNX config에서는 이미지 인식 경로가 ONNX Runtime CPU로 실행된다. 자연어 검색은 `best.pt`가 있으면 PyTorch text tower를 보조로 쓰고, 없으면 keyword/text-index 중심으로 동작한다.
+ONNX config에서는 이미지 인식 경로가 ONNX Runtime CPU로 실행된다. 자연어 검색은 PyTorch checkpoint를 다시 로드하지 않고 keyword/text-index 중심으로 동작한다. 이는 Windows 노트북에서 큰 checkpoint를 중복 로드하며 발생하는 paging file 오류를 피하기 위한 선택이다.
 
 ## 폴더 구조
 
