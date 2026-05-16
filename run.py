@@ -1,4 +1,4 @@
-"""Streamlit 데모 실행 launcher.
+r"""Streamlit 데모 실행 launcher.
 
 사용:
     python run.py
