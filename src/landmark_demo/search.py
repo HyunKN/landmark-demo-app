@@ -32,6 +32,9 @@ class ConfidencePolicy:
     match_threshold: float = 0.60
     match_floor: float = 0.50
     match_margin: float = 0.20
+    isolated_match_threshold: float = 0.40
+    isolated_match_margin: float = 0.30
+    isolated_match_top2_max: float = 0.10
     text_no_keyword_reject_threshold: float = 0.35
 
 
@@ -206,6 +209,13 @@ def apply_decision_policy(
     elif top1_score >= policy.match_floor and margin >= policy.match_margin:
         decision = "matched"
         reason_codes.extend(["top1_mid", "margin_high"])
+    elif (
+        top1_score >= policy.isolated_match_threshold
+        and margin >= policy.isolated_match_margin
+        and top2_score <= policy.isolated_match_top2_max
+    ):
+        decision = "matched"
+        reason_codes.extend(["top1_isolated", "top2_very_low"])
     else:
         decision = "ambiguous"
         if top1_score < policy.match_threshold:

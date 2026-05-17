@@ -1,4 +1,4 @@
-"""Streamlit entry point. 단일 페이지에서 이미지/텍스트/이름 검색 + 정보 페이지를 라우팅."""
+"""Streamlit entry point. 단일 페이지에서 이미지/텍스트 검색 + 정보 페이지를 라우팅."""
 from __future__ import annotations
 
 import io
@@ -20,7 +20,6 @@ from landmark_demo.search import (
     ConfidencePolicy,
     FusionWeights,
     apply_decision_policy,
-    name_search,
     search_by_image,
     search_by_text,
 )
@@ -98,6 +97,9 @@ def _outcome_log_extra(outcome, policy: ConfidencePolicy, model_version: str, qu
             "match_threshold": policy.match_threshold,
             "match_floor": policy.match_floor,
             "match_margin": policy.match_margin,
+            "isolated_match_threshold": policy.isolated_match_threshold,
+            "isolated_match_margin": policy.isolated_match_margin,
+            "isolated_match_top2_max": policy.isolated_match_top2_max,
             "text_no_keyword_reject_threshold": policy.text_no_keyword_reject_threshold,
         },
         "model_version": model_version,
@@ -229,7 +231,7 @@ def main() -> None:
     st.sidebar.divider()
     if st.sidebar.button("모든 검색 초기화"):
         for k in list(st.session_state.keys()):
-            if k.startswith("query_") or k.startswith("img_") or k.startswith("name_"):
+            if k.startswith("query_") or k.startswith("img_"):
                 del st.session_state[k]
         st.session_state["last_outcome"] = None
         st.rerun()
@@ -243,9 +245,9 @@ def main() -> None:
 
     # ---- Search page ----
     st.title("Landmark Assistant")
-    st.caption("MobileCLIP2-S4 기반. 이미지·자연어·이름으로 지원 범위의 랜드마크를 검색합니다.")
+    st.caption("MobileCLIP2-S4 기반. 이미지·자연어로 지원 범위의 랜드마크를 검색합니다.")
 
-    tab_image, tab_text, tab_name = st.tabs(["📷 이미지", "💬 자연어", "🔤 이름"])
+    tab_image, tab_text = st.tabs(["📷 이미지", "💬 자연어"])
 
     last_outcome = st.session_state.get("last_outcome")
 
@@ -324,37 +326,6 @@ def main() -> None:
                 last_outcome = outcome
                 st.session_state["last_outcome"] = outcome
                 render_top3(outcome, bundle, key_prefix="text")
-
-    # ---- Name search ----
-    with tab_name:
-        name_query = st.text_input("장소 이름 (한/영, 부분 일치)", key="name_query")
-        if name_query.strip():
-            result = name_search(name_query, bundle.name_entries, limit=10)
-            if not result.matches:
-                st.info("검색 결과 없음")
-            else:
-                st.caption(f"{len(result.matches)}개 후보")
-                state["logger"].log(
-                    kind="name",
-                    input_id=name_query.strip()[:80],
-                    elapsed_ms=0,
-                    below_threshold=False,
-                    top3=[{"landmark_id": entry.landmark_id, "rank": idx + 1} for idx, entry in enumerate(result.matches[:3])],
-                    scores={},
-                    extra={
-                        "policy_version": "sprint1-reliability-v1",
-                        "decision": "name_lookup",
-                        "reason_codes": ["name_partial_match"],
-                        "model_version": model_version,
-                    },
-                )
-                for entry in result.matches:
-                    info = bundle.info_by_id.get(entry.landmark_id)
-                    label = f"**{info.name_ko}** · {entry.display} ({entry.kind})" if info else entry.display
-                    if st.button(label, key=f"name_pick_{entry.landmark_id}_{entry.kind}"):
-                        st.session_state["selected_landmark_id"] = entry.landmark_id
-                        st.session_state["page"] = "landmark"
-                        st.rerun()
 
     # ---- Dev panel ----
     if dev_mode and last_outcome is not None:

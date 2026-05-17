@@ -56,7 +56,9 @@ def test_image_score_policy_separates_matched_ambiguous_and_out_of_scope() -> No
         return SearchOutcome(top3=top3, all_scores={}, below_threshold=False)
 
     assert apply_decision_policy(outcome([0.789, 0.074, 0.057]), "image", policy).decision == "matched"
+    assert apply_decision_policy(outcome([0.400, 0.000, 0.000]), "image", policy).decision == "matched"
     assert apply_decision_policy(outcome([0.351, 0.257, 0.213]), "image", policy).decision == "ambiguous"
+    assert apply_decision_policy(outcome([0.400, 0.300, 0.300]), "image", policy).decision == "ambiguous"
     assert apply_decision_policy(outcome([0.326, 0.251, 0.214]), "image", policy).decision == "out_of_scope"
 
 

@@ -1,6 +1,6 @@
 # Landmark Assistant
 
-Landmark Assistant는 지원 범위의 랜드마크를 이미지·자연어·이름으로 검색하는 MobileCLIP2-S4 기반 시연 앱이다. 학습된 체크포인트(`best.pt`) 또는 export된 ONNX/INT8 artifact로 Streamlit UI에서 동작을 시연한다.
+Landmark Assistant는 지원 범위의 랜드마크를 이미지·자연어로 검색하는 MobileCLIP2-S4 기반 시연 앱이다. 학습된 체크포인트(`best.pt`) 또는 export된 ONNX/INT8 artifact로 Streamlit UI에서 동작을 시연한다.
 
 > 실행 전 주의: `best.pt`는 약 1.7GB라 GitHub git 저장소에 포함하지 않는다. 저장소를 받은 뒤 학습 산출물 `best.pt`를 프로젝트 루트(`landmark-demo-app/best.pt`)에 놓으면 바로 실행할 수 있다.
 
@@ -30,11 +30,12 @@ python scripts/build_assets.py ^
     --data-root ../Dataset ^
     --landmark-info ./assets/landmark_info.json ^
     --output-dir ./assets ^
-    --device auto
+    --device auto ^
+    --prototype-source head
 ```
 
 산출물:
-- `assets/prototype_index.json` — 13개 클래스 이미지 임베딩 평균
+- `assets/prototype_index.json` — 13개 클래스 prototype. Sprint1 갱신본은 ArcFace head weight를 class center로 사용한다.
 - `assets/landmark_text_index.json` — bilingual text catalog 기반 텍스트 임베딩
 - `assets/hero_images/<id>.jpg` — 13개 대표 이미지 자동 선정
 
@@ -116,7 +117,7 @@ landmark-demo-app/
 │   ├── model.py                         # MobileCLIP2 wrapper
 │   ├── inference.py                     # 이미지/텍스트 인코더
 │   ├── data.py                          # Asset bundle 로더
-│   ├── search.py                        # Fusion ranker, name search
+│   ├── search.py                        # Fusion ranker and confidence policy
 │   └── logging_util.py                  # Debug log
 └── .kiro/specs/landmark-demo-app/       # spec (requirements/design/tasks)
 ```
@@ -127,13 +128,14 @@ landmark-demo-app/
 |---|---|---|
 | 📷 이미지 | JPEG/PNG/WEBP, 10MB 이하 | classifier head 임베딩 ↔ prototype cosine, Top-3 + 신뢰도 상태 |
 | 💬 자연어 | 한/영, 200자 이하 | text encoder + keyword 매칭 fusion (가중치 0.6/0.4) + 신뢰도 상태 |
-| 🔤 이름 | 1자 이상 | NFC+lower-case, 부분 일치 자동완성 |
 
 각 결과 카드 클릭 시 상세 페이지로 이동.
 
 신뢰도 상태는 `matched`, `ambiguous`, `out_of_scope`, `low_quality` 네 가지다. 표시되는 %는 정답 확률이 아니라
 유사도 점수를 사용자용으로 변환한 값이다. JSONL 로그에는 `decision`, `reason_codes`, `top1_score`, `top2_score`,
 `margin`, `thresholds`, `model_version`을 함께 남긴다.
+
+`40/0/0`처럼 1위만 고립되어 높은 경우는 `isolated_match`로 `matched` 처리할 수 있다. 반대로 `40/30/30`처럼 후보가 붙어 있으면 `ambiguous`로 두고 Top-3를 함께 보여 사용자가 상세 페이지에서 고르게 한다.
 
 ## Sprint 1 모바일 artifact
 
@@ -160,8 +162,10 @@ python scripts/benchmark_mobile_artifact.py \
 - `mobile_artifacts/prototype_index.json`
 - `mobile_artifacts/benchmark_report.json`
 
-PC FP32 ONNX Runtime baseline은 external data 포함 약 1.23GB, warm median 약 229ms.
-검증된 dynamic INT8 weight-only artifact는 `mobile_artifacts_int8/`에 두며, external data 포함 약 983MB다. PC 회귀 기준 FP32 대비 top-1 일치율 100%, embedding cosine mean 0.99941, warm median 314ms로 기록했다. Static QDQ 계열은 이전 실험에서 mode collapse가 확인되어 Sprint 1 팀원 배포용으로 쓰지 않는다.
+PC FP32 ONNX Runtime baseline은 external data 포함 약 1.23GB다.
+검증된 dynamic INT8 weight-only artifact는 `mobile_artifacts_int8/`에 두며, external data 포함 약 983MB다. 2026-05-17 새 S4 모델 기준 PC 회귀에서 FP32 대비 top-1 일치율 100%, decision 일치율 100%, embedding cosine mean 0.99942, INT8 warm median 648.95ms로 기록했다. Static QDQ 계열은 이전 실험에서 mode collapse가 확인되어 Sprint 1 팀원 배포용으로 쓰지 않는다.
+
+로컬 C 드라이브 여유 공간이 부족하면 ONNX/INT8 생성은 D 드라이브 같은 scratch 경로에서 수행한 뒤, 완성된 `mobile_artifacts/` 또는 `mobile_artifacts_int8/` 폴더를 프로젝트 루트에 복사해 실행한다.
 
 ## Sprint 1 종합 보고서 (동결)
 

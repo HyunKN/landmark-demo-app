@@ -47,7 +47,7 @@ def parse_args() -> argparse.Namespace:
                    help="Op types to quantize. ViT is MatMul-heavy.")
     p.add_argument("--temp-dir", default=None,
                    help="Override scratch dir. Quantization writes ~3-4x the "
-                        "FP32 model size in temporaries; default %TEMP% on "
+                        "FP32 model size in temporaries; default %%TEMP%% on "
                         "Windows often points at C: which can be tight.")
     p.add_argument("--min-temp-free-gb", type=float, default=8.0,
                    help="Minimum free space (GB) required on the chosen scratch "
@@ -248,6 +248,7 @@ def main() -> None:
     _os.environ["TMPDIR"] = str(scratch_root)
     _os.environ["TEMP"] = str(scratch_root)
     _os.environ["TMP"] = str(scratch_root)
+    tempfile.tempdir = str(scratch_root)
 
     with tempfile.TemporaryDirectory(prefix="lm_quant_", dir=str(scratch_root)) as tmp:
         work_dir = Path(tmp)

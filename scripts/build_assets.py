@@ -72,13 +72,13 @@ def select_hero(records: list[dict]) -> Path | None:
     return Path(scored[0][1]) if scored else None
 
 
-def build_prototypes(model, recognizer: ImageRecognizer, data_root: Path, classes: list[str]) -> dict:
+def build_prototypes(model, recognizer: ImageRecognizer, data_root: Path, classes: list[str], batch_size: int) -> dict:
     items = []
     for landmark_id in classes:
         records = collect_class_images(data_root, landmark_id)
-        print(f"[proto] {landmark_id}: {len(records)} confirmed images")
+        print(f"[proto] {landmark_id}: {len(records)} confirmed images", flush=True)
         if not records:
-            print(f"  WARN: no images, using zero prototype")
+            print(f"  WARN: no images, using zero prototype", flush=True)
             items.append({
                 "landmark_id": landmark_id,
                 "prototype": [0.0] * 512,
@@ -88,15 +88,33 @@ def build_prototypes(model, recognizer: ImageRecognizer, data_root: Path, classe
             continue
         embeddings = []
         view_counts: dict[str, int] = {}
-        for r in records:
+        batch_tensors: list[torch.Tensor] = []
+        batch_records: list[dict] = []
+
+        def flush_batch() -> None:
+            if not batch_tensors:
+                return
+            tensor = torch.cat(batch_tensors, dim=0)
+            with torch.no_grad():
+                _, batch_embeddings = model(tensor)
+            for row, record in zip(batch_embeddings.cpu().numpy().astype(np.float32), batch_records):
+                embeddings.append(row)
+                vt = record.get("view_type") or "unknown"
+                view_counts[vt] = view_counts.get(vt, 0) + 1
+            batch_tensors.clear()
+            batch_records.clear()
+
+        for idx, r in enumerate(records, start=1):
             try:
                 img = Image.open(r["_abs_path"]).convert("RGB")
-                emb, _ = recognizer.encode(img)
-                embeddings.append(emb)
-                vt = r.get("view_type") or "unknown"
-                view_counts[vt] = view_counts.get(vt, 0) + 1
+                batch_tensors.append(recognizer.preprocess(img))
+                batch_records.append(r)
+                if len(batch_tensors) >= batch_size:
+                    flush_batch()
+                    print(f"  encoded {idx}/{len(records)}", flush=True)
             except Exception as exc:
-                print(f"  skip {r['_abs_path']}: {exc}")
+                print(f"  skip {r['_abs_path']}: {exc}", flush=True)
+        flush_batch()
         if not embeddings:
             continue
         proto = np.mean(np.stack(embeddings), axis=0)
@@ -105,6 +123,37 @@ def build_prototypes(model, recognizer: ImageRecognizer, data_root: Path, classe
             "landmark_id": landmark_id,
             "prototype": proto.astype(float).tolist(),
             "n_samples_used": len(embeddings),
+            "view_breakdown": view_counts,
+        })
+    return items
+
+
+def build_head_prototypes(model, data_root: Path, classes: list[str]) -> list[dict]:
+    """Use the trained classification head as class anchors.
+
+    The Sprint 1 S4 checkpoint uses ArcFace, whose head weights act as
+    normalized class centers in the learned embedding space. This is much
+    faster than re-encoding every training image on a CPU-only demo machine.
+    """
+    if not hasattr(model, "head") or not hasattr(model.head, "weight"):
+        raise ValueError("checkpoint model has no head.weight for prototype export")
+    weights = torch.nn.functional.normalize(model.head.weight.detach().float(), dim=1).cpu().numpy()
+    if weights.shape[0] != len(classes):
+        raise ValueError(f"head rows/classes mismatch: {weights.shape[0]} != {len(classes)}")
+
+    items = []
+    for idx, landmark_id in enumerate(classes):
+        records = collect_class_images(data_root, landmark_id)
+        view_counts: dict[str, int] = {}
+        for record in records:
+            vt = record.get("view_type") or "unknown"
+            view_counts[vt] = view_counts.get(vt, 0) + 1
+        print(f"[proto-head] {landmark_id}: class head anchor, {len(records)} confirmed images referenced", flush=True)
+        items.append({
+            "landmark_id": landmark_id,
+            "prototype_source": "arcface_head_weight",
+            "prototype": weights[idx].astype(float).tolist(),
+            "n_samples_used": len(records),
             "view_breakdown": view_counts,
         })
     return items
@@ -133,13 +182,15 @@ def _catalog_texts(entry: dict, catalog_entry: dict | None) -> tuple[list[str], 
             "user_queries_ko",
             "visual_features_en",
             "visual_features_ko",
-            "contrast_en",
-            "contrast_ko",
         ):
             values = catalog_entry.get(key, [])
             if isinstance(values, list):
                 parts.extend(str(v) for v in values if v)
                 keywords.extend(str(v) for v in values if v)
+        for key in ("contrast_en", "contrast_ko"):
+            values = catalog_entry.get(key, [])
+            if isinstance(values, list):
+                parts.extend(str(v) for v in values if v)
         for key in ("description_en", "description_ko"):
             value = catalog_entry.get(key)
             if value:
@@ -209,14 +260,16 @@ def main() -> None:
     parser.add_argument("--skip-prototypes", action="store_true")
     parser.add_argument("--skip-text-index", action="store_true")
     parser.add_argument("--skip-hero-images", action="store_true")
+    parser.add_argument("--batch-size", type=int, default=8)
+    parser.add_argument("--prototype-source", choices=["image-average", "head"], default="image-average")
     args = parser.parse_args()
 
     device = pick_device(args.device)
-    print(f"[env] device={device}")
+    print(f"[env] device={device}", flush=True)
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"[load] checkpoint: {args.checkpoint}")
+    print(f"[load] checkpoint: {args.checkpoint}", flush=True)
     model, classes, cfg = load_checkpoint(args.checkpoint, device=device)
     image_size = int(cfg["training"]["image_size"])
     image_mean = list(cfg["training"]["image_mean"])
@@ -227,20 +280,19 @@ def main() -> None:
     text_catalog_path = Path(args.text_catalog) if args.text_catalog else Path(args.landmark_info).with_name("landmark_text_catalog_v2.json")
     text_catalog = _load_text_catalog(text_catalog_path)
     if text_catalog:
-        print(f"[load] text catalog: {text_catalog_path} ({len(text_catalog)} classes)")
+        print(f"[load] text catalog: {text_catalog_path} ({len(text_catalog)} classes)", flush=True)
     info_classes = [it["landmark_id"] for it in landmark_info["items"]]
     if set(info_classes) != set(classes):
         print(f"  WARN: landmark_info={info_classes}\n  ckpt={classes}")
 
     # Hero images
     if not args.skip_hero_images:
-        print("\n=== copying hero images ===")
+        print("\n=== copying hero images ===", flush=True)
         copy_hero_images(Path(args.data_root), classes, output_dir / "hero_images")
 
     # Prototypes
     if not args.skip_prototypes:
-        print("\n=== building prototype index ===")
-        proto_items = build_prototypes(model, recognizer, Path(args.data_root), classes)
+        print("\n=== building prototype index ===", flush=True)
         proto_doc = {
             "version": "sprint1-v1",
             "encoder": {
@@ -249,16 +301,21 @@ def main() -> None:
                 "embedding_dim": int(cfg["training"].get("embedding_dim", 512)),
                 "image_mean": image_mean,
                 "image_std": image_std,
+                "prototype_source": args.prototype_source,
             },
-            "items": proto_items,
+            "items": (
+                build_head_prototypes(model, Path(args.data_root), classes)
+                if args.prototype_source == "head"
+                else build_prototypes(model, recognizer, Path(args.data_root), classes, max(1, args.batch_size))
+            ),
         }
         out_path = output_dir / "prototype_index.json"
         out_path.write_text(json.dumps(proto_doc, ensure_ascii=False, indent=2), encoding="utf-8")
-        print(f"[write] {out_path}")
+        print(f"[write] {out_path}", flush=True)
 
     # Text index
     if not args.skip_text_index:
-        print("\n=== building text index ===")
+        print("\n=== building text index ===", flush=True)
         import open_clip
         tokenizer = open_clip.get_tokenizer(cfg["model"]["model_name"])
         text_encoder = TextEncoder(model, tokenizer, device=device)
@@ -274,9 +331,9 @@ def main() -> None:
         }
         out_path = output_dir / "landmark_text_index.json"
         out_path.write_text(json.dumps(text_doc, ensure_ascii=False, indent=2), encoding="utf-8")
-        print(f"[write] {out_path}")
+        print(f"[write] {out_path}", flush=True)
 
-    print("\n[done]")
+    print("\n[done]", flush=True)
 
 
 if __name__ == "__main__":

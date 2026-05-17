@@ -21,6 +21,9 @@ weak_margin = 0.12
 match_threshold = 0.60
 match_floor = 0.50
 match_margin = 0.20
+isolated_match_threshold = 0.40
+isolated_match_margin = 0.30
+isolated_match_top2_max = 0.10
 text_no_keyword_reject_threshold = 0.35
 
 [ui]
