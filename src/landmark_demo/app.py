@@ -242,6 +242,8 @@ def main() -> None:
             if k.startswith("query_") or k.startswith("img_"):
                 del st.session_state[k]
         st.session_state["last_outcome"] = None
+        st.session_state["last_image_outcome"] = None
+        st.session_state["last_text_outcome"] = None
         st.rerun()
 
     if "page" not in st.session_state:
@@ -298,7 +300,14 @@ def main() -> None:
                 )
                 last_outcome = outcome
                 st.session_state["last_outcome"] = outcome
-                render_top3(outcome, bundle, key_prefix="img")
+                st.session_state["last_image_outcome"] = outcome
+
+        # 카드 렌더링은 매 rerun마다 session_state에서 읽어 호출.
+        # "자세히 보기" 버튼 클릭으로 rerun된 경우에도 같은 카드가 다시 그려져
+        # 클릭 핸들러가 정상 실행될 수 있게 한다.
+        last_image_outcome = st.session_state.get("last_image_outcome")
+        if last_image_outcome is not None:
+            render_top3(last_image_outcome, bundle, key_prefix="img")
 
     # ---- Text search ----
     with tab_text:
@@ -333,7 +342,14 @@ def main() -> None:
                 )
                 last_outcome = outcome
                 st.session_state["last_outcome"] = outcome
-                render_top3(outcome, bundle, key_prefix="text")
+                st.session_state["last_text_outcome"] = outcome
+
+        # 카드 렌더링은 매 rerun마다 session_state에서 읽어 호출.
+        # 검색 버튼이 안 눌린 rerun(예: "자세히 보기" 클릭으로 인한 rerun)에서도
+        # 카드가 다시 그려져야 클릭 핸들러가 동작한다.
+        last_text_outcome = st.session_state.get("last_text_outcome")
+        if last_text_outcome is not None:
+            render_top3(last_text_outcome, bundle, key_prefix="text")
 
     # ---- Dev panel ----
     if dev_mode and last_outcome is not None:
