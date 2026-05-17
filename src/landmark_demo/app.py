@@ -124,6 +124,37 @@ def _outcome_log_extra(outcome, policy: ConfidencePolicy, model_version: str, qu
     return extra
 
 
+def _query_landmark_id() -> str | None:
+    try:
+        value = st.query_params.get("landmark_id")
+    except Exception:
+        return None
+    if isinstance(value, list):
+        value = value[0] if value else None
+    return str(value) if value else None
+
+
+def _open_landmark_page(landmark_id: str) -> None:
+    st.session_state["selected_landmark_id"] = landmark_id
+    st.session_state["page"] = "landmark"
+    try:
+        st.query_params["landmark_id"] = landmark_id
+    except Exception:
+        pass
+    st.rerun()
+
+
+def _open_search_page() -> None:
+    st.session_state["page"] = "search"
+    st.session_state.pop("selected_landmark_id", None)
+    try:
+        if "landmark_id" in st.query_params:
+            del st.query_params["landmark_id"]
+    except Exception:
+        pass
+    st.rerun()
+
+
 def render_top3(outcome, bundle, key_prefix: str) -> None:
     show_key = f"{key_prefix}_show_low_confidence"
     if outcome.decision == "out_of_scope" and not st.session_state.get(show_key, False):
@@ -158,9 +189,7 @@ def render_top3(outcome, bundle, key_prefix: str) -> None:
             st.progress(item.percentage / 100.0, text=f"{item.percentage}%")
             st.caption(f"`{item.landmark_id}`")
             if st.button("자세히 보기", key=f"{key_prefix}_detail_{item.landmark_id}_{item.rank}"):
-                st.session_state["selected_landmark_id"] = item.landmark_id
-                st.session_state["page"] = "landmark"
-                st.rerun()
+                _open_landmark_page(item.landmark_id)
 
 
 def render_landmark_page(landmark_id: str, bundle, asset_dir: Path) -> None:
@@ -168,13 +197,11 @@ def render_landmark_page(landmark_id: str, bundle, asset_dir: Path) -> None:
     if info is None:
         st.error(f"메타데이터를 찾을 수 없습니다: `{landmark_id}`")
         if st.button("← 검색으로 돌아가기"):
-            st.session_state["page"] = "search"
-            st.rerun()
+            _open_search_page()
         return
 
     if st.button("← 검색으로 돌아가기", key="back_to_search"):
-        st.session_state["page"] = "search"
-        st.rerun()
+        _open_search_page()
 
     st.title(info.name_ko)
     st.caption(f"{info.name_en} · `{info.landmark_id}`")
@@ -248,6 +275,10 @@ def main() -> None:
 
     if "page" not in st.session_state:
         st.session_state["page"] = "search"
+    route_landmark_id = _query_landmark_id()
+    if route_landmark_id:
+        st.session_state["selected_landmark_id"] = route_landmark_id
+        st.session_state["page"] = "landmark"
 
     if st.session_state["page"] == "landmark":
         render_landmark_page(st.session_state.get("selected_landmark_id", ""), bundle, asset_dir)
