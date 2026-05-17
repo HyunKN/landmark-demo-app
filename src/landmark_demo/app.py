@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from landmark_demo.config import load_config
 from landmark_demo.data import LANDMARK_CATALOG, load_asset_bundle
-from landmark_demo.inference import ImageRecognizer, OnnxImageRecognizer, TextEncoder, assess_image_quality, validate_image_file
+from landmark_demo.inference import ImageRecognizer, OnnxImageRecognizer, OnnxTextEncoder, TextEncoder, assess_image_quality, validate_image_file
 from landmark_demo.logging_util import DebugLogger
 from landmark_demo.model import load_checkpoint
 from landmark_demo.search import (
@@ -53,10 +53,18 @@ def boot(config_path: str):
         image_std = list(train_cfg["training"]["image_std"])
         recognizer = ImageRecognizer(model, image_size, image_mean, image_std, device=device)
 
-    # Text encoder (선택적). ONNX mode keeps the app lightweight and avoids
-    # loading the large PyTorch checkpoint again just for text search.
+    # Text encoder. PyTorch mode reuses the loaded checkpoint's text tower.
+    # ONNX/INT8 modes load text_encoder.onnx so natural-language search can run
+    # as semantic retrieval instead of keyword/alias-only fallback.
     text_encoder = None
-    if cfg.inference_backend != "onnx" and model is not None and train_cfg is not None:
+    if cfg.inference_backend == "onnx":
+        try:
+            text_encoder = OnnxTextEncoder(cfg.mobile_artifact_dir)
+        except FileNotFoundError as exc:
+            print(f"[boot] ONNX text encoder unavailable: {exc}")
+        except Exception as exc:
+            print(f"[boot] ONNX text encoder failed to load: {exc}")
+    elif model is not None and train_cfg is not None:
         try:
             import open_clip
             tokenizer = open_clip.get_tokenizer(train_cfg["model"]["model_name"])

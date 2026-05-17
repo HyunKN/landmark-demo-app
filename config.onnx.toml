@@ -2,7 +2,7 @@
 assets_dir = "./assets"
 log_path = "./logs/demo_onnx.jsonl"
 checkpoint = "./best.pt"
-mobile_artifact_dir = "./mobile_artifacts"
+mobile_artifact_dir = "D:/landmark-demo-artifacts/mobile_artifacts"
 
 [runtime]
 device = "cpu"

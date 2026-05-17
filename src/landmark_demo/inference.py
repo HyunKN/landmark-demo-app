@@ -140,6 +140,56 @@ class TextEncoder:
         return embeddings.cpu().numpy().astype(np.float32)
 
 
+class OnnxTextEncoder:
+    """ONNX Runtime text encoder.
+
+    Mirrors `TextEncoder.encode` for the ONNX/INT8 demo paths so that natural
+    language search can rely on semantic embeddings instead of falling back to
+    keyword/alias matching only. Reads `text_encoder.onnx` and
+    `text_preprocessing.json` from the mobile artifact directory; the tokenizer
+    is reconstructed via open_clip using the recorded model name.
+    """
+
+    def __init__(self, artifact_dir: str | Path) -> None:
+        artifact_dir = Path(artifact_dir)
+        onnx_path = artifact_dir / "text_encoder.onnx"
+        meta_path = artifact_dir / "text_preprocessing.json"
+        if not onnx_path.exists():
+            raise FileNotFoundError(f"missing text encoder ONNX: {onnx_path}")
+        if not meta_path.exists():
+            raise FileNotFoundError(f"missing text preprocessing metadata: {meta_path}")
+
+        self.meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        self.context_length = int(self.meta.get("context_length", 77))
+
+        import onnxruntime as ort
+        self.session = ort.InferenceSession(str(onnx_path), providers=["CPUExecutionProvider"])
+        self.input_name = self.session.get_inputs()[0].name
+        self.output_name = self.session.get_outputs()[0].name
+
+        # Build tokenizer. We reuse open_clip's tokenizer rather than shipping a
+        # standalone tokenizer to keep the wheel small. The artifact records the
+        # model name (e.g. "MobileCLIP2-S4") so this works without ckpt access.
+        import open_clip
+        tokenizer_name = self.meta.get("open_clip_name") or self.meta.get("tokenizer", {}).get("open_clip_name", "MobileCLIP2-S4")
+        self.tokenizer = open_clip.get_tokenizer(tokenizer_name)
+
+    def encode(self, text: str) -> np.ndarray:
+        tokens = self.tokenizer([text]).to(torch.int64).cpu().numpy()
+        if tokens.shape[1] != self.context_length:
+            # Pad or truncate to match the exported context length
+            pad = np.zeros((tokens.shape[0], self.context_length), dtype=np.int64)
+            n = min(tokens.shape[1], self.context_length)
+            pad[:, :n] = tokens[:, :n]
+            tokens = pad
+        embedding = self.session.run([self.output_name], {self.input_name: tokens})[0][0]
+        embedding = embedding.astype(np.float32)
+        norm = float(np.linalg.norm(embedding))
+        if norm > 0:
+            embedding = embedding / norm
+        return embedding
+
+
 def validate_image_file(filename: str, size_bytes: int, max_mb: int = 10) -> tuple[bool, str]:
     ext = filename.rsplit(".", 1)[-1].upper() if "." in filename else ""
     if ext not in SUPPORTED_FORMATS:
